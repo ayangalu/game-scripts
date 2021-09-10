@@ -1,0 +1,27 @@
+{
+	"Skyward Sword": {
+		"root": "skyward-sword",
+		"locales": ["de-DE", "en-GB", "ja-JP"],
+		"characters": { "tloz:link": "Link" }
+	},
+	"Skyward Sword HD": {
+		"root": "skyward-sword-hd",
+		"locales": [
+			"de-DE",
+			"en-GB",
+			"en-US",
+			"es-ES",
+			"es-US",
+			"fr-FR",
+			"fr-US",
+			"it-IT",
+			"ja-JP",
+			"ko-KR",
+			"nl-NL",
+			"ru-RU",
+			"zh-CN",
+			"zh-TW"
+		],
+		"characters": { "tloz:link": "Link" }
+	}
+}

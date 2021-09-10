@@ -1,0 +1,32 @@
+{
+	"name": "ss-text-dump",
+	"volta": {
+		"node": "16.8.0"
+	},
+	"scripts": {
+		"dump": "ts-node -P tsconfig.tools.json --transpile-only tools/dump.ts",
+		"inspect": "ts-node -P tsconfig.tools.json --transpile-only tools/inspect.ts",
+		"serve": "vite serve display",
+		"preview": "vite preview display",
+		"build": "vite build display"
+	},
+	"dependencies": {
+		"cheerio": "1.0.0-rc.10",
+		"lit": "2.0.0-rc.3",
+		"lodash": "4.17.21"
+	},
+	"devDependencies": {
+		"@shoelace-style/shoelace": "2.0.0-beta.50",
+		"@tswt/dedicated-worker": "0.0.1-alpha.10",
+		"@tswt/window": "0.0.1-alpha.10",
+		"@types/lodash": "4.14.172",
+		"@types/node": "16.7.10",
+		"fast-png": "5.0.4",
+		"html-entities": "2.3.2",
+		"html-validate": "5.4.1",
+		"prettier": "2.3.2",
+		"ts-node": "10.2.1",
+		"typescript": "4.3.5",
+		"vite": "2.5.3"
+	}
+}

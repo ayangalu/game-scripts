@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"target": "es2020",
+		"module": "commonjs",
+		"lib": ["es2020"],
+		"types": ["node", "lodash"]
+	},
+	"include": ["tools/**/*.ts", "types.ts"]
+}

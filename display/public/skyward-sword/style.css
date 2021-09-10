@@ -1,0 +1,170 @@
+@import url('style/table.css');
+@import url('style/common.css');
+@import url('style/color.css');
+@import url('style/emoji.css');
+
+.emoji {
+	--height: 39;
+}
+
+.emoji.button-a {
+	--width: 36;
+	background-image: url('emoji/button-a.png');
+}
+
+.emoji.button-b {
+	--width: 30;
+	background-image: url('emoji/button-b.png');
+}
+
+.emoji.button-minus {
+	--width: 28;
+	background-image: url('emoji/button-minus.png');
+}
+
+.emoji.button-plus {
+	--width: 28;
+	background-image: url('emoji/button-plus.png');
+}
+
+.emoji.button-1 {
+	--width: 30;
+	background-image: url('emoji/button-1.png');
+}
+
+.emoji.button-2 {
+	--width: 30;
+	background-image: url('emoji/button-2.png');
+}
+
+.emoji.button-c {
+	--width: 38;
+	background-image: url('emoji/button-c.png');
+}
+
+.emoji.button-z {
+	--width: 40;
+	background-image: url('emoji/button-z.png');
+}
+
+.emoji.stick {
+	--width: 40;
+}
+
+.emoji.stick.center {
+	background-image: url('emoji/control-stick.png');
+}
+
+@keyframes emoji-stick-move {
+	0%,
+	100% {
+		background-image: url('emoji/control-stick.png');
+	}
+	50% {
+		background-image: var(--direction);
+	}
+}
+
+.emoji.stick.move {
+	animation: emoji-stick-move 1s steps(1) infinite;
+}
+
+.emoji.stick.move.up {
+	--direction: url('emoji/control-stick-up.png');
+}
+
+.emoji.stick.move.down {
+	--direction: url('emoji/control-stick-down.png');
+}
+
+.emoji.stick.move.left {
+	--direction: url('emoji/control-stick-left.png');
+}
+
+.emoji.stick.move.right {
+	--direction: url('emoji/control-stick-right.png');
+}
+
+@keyframes emoji-stick-axis {
+	0%,
+	50%,
+	100% {
+		background-image: url('emoji/control-stick.png');
+	}
+	25% {
+		background-image: var(--negative);
+	}
+	75% {
+		background-image: var(--positive);
+	}
+}
+
+.emoji.stick.axis {
+	animation: emoji-stick-axis 2s steps(1) infinite;
+}
+
+.emoji.stick.axis.y {
+	--negative: url('emoji/control-stick-up.png');
+	--positive: url('emoji/control-stick-down.png');
+}
+
+.emoji.stick.axis.x {
+	--negative: url('emoji/control-stick-left.png');
+	--positive: url('emoji/control-stick-right.png');
+}
+
+.emoji.d-pad {
+	--width: 40;
+	background-image: url('emoji/d-pad.png');
+}
+
+.emoji.d-pad.up {
+	background-image: url('emoji/d-pad-up.png');
+}
+
+.emoji.d-pad.down {
+	background-image: url('emoji/d-pad-down.png');
+}
+
+.emoji.d-pad.left {
+	background-image: url('emoji/d-pad-left.png');
+}
+
+.emoji.d-pad.right {
+	background-image: url('emoji/d-pad-right.png');
+}
+
+.emoji.arrow.up {
+	--width: 36;
+	background-image: url('emoji/arrow-up.png');
+}
+
+.emoji.arrow.down {
+	--width: 36;
+	background-image: url('emoji/arrow-down.png');
+}
+
+.emoji.arrow.left {
+	--width: 40;
+	background-image: url('emoji/arrow-left.png');
+}
+
+.emoji.arrow.right {
+	--width: 40;
+	background-image: url('emoji/arrow-right.png');
+}
+
+.emoji.pointer {
+	--width: 30;
+	background-image: url('emoji/pointer.png');
+}
+
+.emoji.x-mark {
+	--width: 28;
+	background-image: url('emoji/x-mark.png');
+}
+
+.emoji.insect-mark {
+	--width: 38;
+	background-image: url('emoji/insect-mark.png');
+}
