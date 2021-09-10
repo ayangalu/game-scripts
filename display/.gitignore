@@ -1,3 +1,4 @@
 dist
 message.json
+vite.build-config.json
 *.png
