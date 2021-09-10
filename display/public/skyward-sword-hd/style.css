@@ -1,7 +1,7 @@
-@import url('/skyward-sword/style/table.css');
-@import url('/skyward-sword/style/common.css');
-@import url('/skyward-sword/style/color.css');
-@import url('/skyward-sword/style/emoji.css');
+@import url('/game-scripts/skyward-sword/style/table.css');
+@import url('/game-scripts/skyward-sword/style/common.css');
+@import url('/game-scripts/skyward-sword/style/color.css');
+@import url('/game-scripts/skyward-sword/style/emoji.css');
 
 .emoji {
 	--height: 80;
