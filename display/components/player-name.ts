@@ -14,9 +14,16 @@ export class PlayerName extends LitElement {
 	@property()
 	character = '';
 
+	private capitalize = false;
+
 	constructor() {
 		super();
 		PlayerName.elementRegistry.add(this);
+
+		if (this.parentElement?.classList.contains('capitalize')) {
+			this.style.textTransform = 'none';
+			this.capitalize = true;
+		}
 	}
 
 	disconnectedCallback() {
@@ -25,6 +32,7 @@ export class PlayerName extends LitElement {
 	}
 
 	render() {
-		return html`${PlayerName.characterRegistry.get(this.character)}`;
+		const name = PlayerName.characterRegistry.get(this.character);
+		return html`${this.capitalize ? `${name?.charAt(0).toUpperCase()}${name?.slice(1)}` : name}`;
 	}
 }

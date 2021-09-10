@@ -1,3 +1,7 @@
 .numeric-placeholder::before {
 	content: '＃';
 }
+
+.capitalize {
+	text-transform: uppercase;
+}
