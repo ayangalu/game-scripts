@@ -118,9 +118,17 @@ export function rubyFormatter(): ShiftOutFormatter {
 	};
 }
 
-export function colorFormatter(colors: Partial<Record<number, string>>, reset = 0xffff): ShiftOutFormatter {
+export function colorFormatter<T extends string | number>({
+	colors,
+	lookup,
+	reset,
+}: {
+	colors: Partial<Record<T, string>>;
+	lookup: (reader: BinaryReader) => T;
+	reset: T;
+}): ShiftOutFormatter {
 	return ({ parameters, openMarkupTags }) => {
-		const option = parameters.next(DataType.UInt16);
+		const option = lookup(parameters);
 
 		let markup = '';
 
@@ -135,7 +143,10 @@ export function colorFormatter(colors: Partial<Record<number, string>>, reset = 
 			}
 		}
 
-		const classList = ['color', colors[option] ?? ['unknown', hex(option, 4)]].flat();
+		const classList = [
+			'color',
+			colors[option] ?? ['unknown', typeof option === 'number' ? hex(option, 4) : option],
+		].flat();
 
 		openMarkupTags.unshift(`span.${classList.join('.')}`);
 

@@ -2,6 +2,7 @@ import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { ensure } from '../../ensure';
+import { DataType } from '../../parsers/binary';
 import {
 	capitalizationFormatter,
 	choiceFormatter,
@@ -256,20 +257,24 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 			[ShiftCode.Out]: {
 				0x0000: {
 					0x0000: rubyFormatter(),
-					0x0003: colorFormatter({
-						0x0000: 'emphasis',
-						0x0001: 'warning',
-						0x0002: 'legend',
-						0x0003: 'name',
-						0x0004: 'action',
-						0x0005: 'item',
-						0x0006: 'intro',
-						0x0007: 'rupee-green',
-						0x0008: 'rupee-blue',
-						0x0009: 'rupee-red',
-						0x000a: 'rupee-silver',
-						0x000b: 'rupee-gold',
-						0x000c: 'rupee-baba',
+					0x0003: colorFormatter<number>({
+						lookup: (parameters) => parameters.next(DataType.UInt16),
+						reset: 0xffff,
+						colors: {
+							0x0000: 'emphasis',
+							0x0001: 'warning',
+							0x0002: 'legend',
+							0x0003: 'name',
+							0x0004: 'action',
+							0x0005: 'item',
+							0x0006: 'intro',
+							0x0007: 'rupee-green',
+							0x0008: 'rupee-blue',
+							0x0009: 'rupee-red',
+							0x000a: 'rupee-silver',
+							0x000b: 'rupee-gold',
+							0x000c: 'rupee-baba',
+						},
 					}),
 				},
 				0x0001: {
