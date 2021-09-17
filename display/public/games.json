@@ -23,5 +23,25 @@
 			"zh-TW"
 		],
 		"characters": { "tloz:link": "Link" }
+	},
+	"Link's Awakening": {
+		"root": "links-awakening",
+		"locales": [
+			"de-DE",
+			"en-GB",
+			"en-US",
+			"es-ES",
+			"es-US",
+			"fr-FR",
+			"fr-US",
+			"it-IT",
+			"ja-JP",
+			"ko-KR",
+			"nl-NL",
+			"ru-RU",
+			"zh-CN",
+			"zh-TW"
+		],
+		"characters": { "tloz:link": "Link" }
 	}
 }

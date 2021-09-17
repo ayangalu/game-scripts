@@ -1,13 +1,12 @@
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
+import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format';
 import { ensure } from '../../ensure';
 import { DataType } from '../../parsers/binary';
 import {
 	capitalizationFormatter,
-	choiceFormatter,
 	colorFormatter,
-	FormatTree,
 	hex,
 	rubyFormatter,
 	ShiftCode,
@@ -196,6 +195,42 @@ const josa = {
 	0x05: ['로', '으로'],
 };
 
+function choiceFormatter(index: number): ShiftOutFormatter {
+	return ({ openMarkupTags }) => {
+		let markup = '';
+
+		const moveSpans: string[] = [];
+
+		while (openMarkupTags[0]?.startsWith('span')) {
+			moveSpans.unshift(openMarkupTags.shift()!);
+			markup += `</span>`;
+		}
+
+		if (index === 0) {
+			openMarkupTags.unshift('ul');
+			markup += '<ul>';
+		} else {
+			// expect last tag to be choice item
+			openMarkupTags.shift();
+			markup += `</li>`;
+		}
+
+		const classList = ['choice', `option-${index + 1}`];
+
+		markup += `<li class="${classList.join(' ')}">`;
+
+		for (const selector of moveSpans) {
+			const spanClassList = selector.split('.').slice(1);
+			markup += `<span class="${spanClassList.join(' ')}">`;
+		}
+
+		openMarkupTags.unshift(`li.${classList.join('.')}`);
+		openMarkupTags.unshift(...moveSpans.reverse());
+
+		return markup;
+	};
+}
+
 function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 	const minimalFormatters = {
 		[ShiftCode.Out]: {
@@ -259,7 +294,7 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 					0x0000: rubyFormatter(),
 					0x0003: colorFormatter<number>({
 						lookup: (parameters) => parameters.next(DataType.UInt16),
-						reset: 0xffff,
+						reset: [0xffff],
 						colors: {
 							0x0000: 'emphasis',
 							0x0001: 'warning',

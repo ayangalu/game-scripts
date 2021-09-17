@@ -1,0 +1,183 @@
+@import url('style/table.css');
+@import url('style/common.css');
+@import url('style/color.css');
+@import url('style/emoji.css');
+
+.emoji {
+	--height: 60;
+}
+
+.emoji.button-plus {
+	--width: 44;
+	background-image: url('emoji/button-plus.png');
+}
+
+.emoji.button-minus {
+	--width: 44;
+	background-image: url('emoji/button-minus.png');
+}
+
+.emoji.button-a {
+	--width: 44;
+	background-image: url('emoji/button-a.png');
+}
+
+.emoji.button-b {
+	--width: 44;
+	background-image: url('emoji/button-b.png');
+}
+
+.emoji.button-l {
+	--width: 44;
+	background-image: url('emoji/button-l.png');
+}
+
+.emoji.stick-l {
+	--width: 44;
+	background-image: url('emoji/stick-l.png');
+}
+
+.emoji.button-r {
+	--width: 44;
+	background-image: url('emoji/button-r.png');
+}
+
+.emoji.button-x {
+	--width: 44;
+	background-image: url('emoji/button-x.png');
+}
+
+.emoji.button-y {
+	--width: 44;
+	background-image: url('emoji/button-y.png');
+}
+
+.emoji.button-l-start {
+	--width: 44;
+	background-image: url('emoji/button-l-start.png');
+}
+
+.emoji.stick-r {
+	--width: 52;
+	background-image: url('emoji/stick-r.png');
+}
+
+.emoji.button-r-start {
+	--width: 44;
+	background-image: url('emoji/button-r-start.png');
+}
+
+.emoji.x {
+	--width: 46;
+	background-image: url('emoji/x.png');
+}
+
+.emoji.d-pad-down {
+	--width: 44;
+	background-image: url('emoji/d-pad-down.png');
+}
+
+.emoji.d-pad-up {
+	--width: 44;
+	background-image: url('emoji/d-pad-up.png');
+}
+
+.emoji.arrow-up {
+	--width: 44;
+	background-image: url('emoji/arrow-up.png');
+}
+
+.emoji.arrow-down {
+	--width: 44;
+	background-image: url('emoji/arrow-down.png');
+}
+
+.emoji.banana {
+	--width: 49;
+	background-image: url('emoji/banana.png');
+}
+
+.emoji.pineapple {
+	--width: 44;
+	background-image: url('emoji/pineapple.png');
+}
+
+.emoji.necklace {
+	--width: 47;
+	background-image: url('emoji/necklace.png');
+}
+
+.emoji.marin {
+	--width: 46;
+	background-image: url('emoji/marin.png');
+}
+
+.emoji.yoshi {
+	--width: 44;
+	background-image: url('emoji/yoshi.png');
+}
+
+.emoji.ribbon {
+	--width: 55;
+	background-image: url('emoji/ribbon.png');
+}
+
+.emoji.stick {
+	--width: 44;
+	background-image: url('emoji/stick.png');
+}
+
+.emoji.broom {
+	--width: 44;
+	background-image: url('emoji/broom.png');
+}
+
+.emoji.letter {
+	--width: 50;
+	background-image: url('emoji/letter.png');
+}
+
+.emoji.dogfood {
+	--width: 57;
+	background-image: url('emoji/dogfood.png');
+}
+
+.emoji.link {
+	--width: 46;
+	background-image: url('emoji/link.png');
+}
+
+.emoji.hibiscus {
+	--width: 44;
+	background-image: url('emoji/hibiscus.png');
+}
+
+.emoji.honeycomb {
+	--width: 44;
+	background-image: url('emoji/honeycomb.png');
+}
+
+.emoji.hook {
+	--width: 44;
+	background-image: url('emoji/hook.png');
+}
+
+.emoji.skull {
+	--width: 53;
+	background-image: url('emoji/skull.png');
+}
+
+.emoji.scale {
+	--width: 53;
+	background-image: url('emoji/scale.png');
+}
+
+.emoji.arrow-left {
+	--width: 44;
+	background-image: url('emoji/arrow-left.png');
+}
+
+.emoji.arrow-right {
+	--width: 44;
+	background-image: url('emoji/arrow-right.png');
+}

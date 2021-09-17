@@ -303,7 +303,7 @@ export class GameScripts extends LitElement {
 			<sl-menu>
 				${Object.keys(data).map((group) => {
 					return html`
-						<sl-menu-label>${group}</sl-menu-label>
+						${group ? html`<sl-menu-label>${group}</sl-menu-label>` : nothing}
 						${Object.keys(data[group]).map((option) => {
 							return html`
 								<sl-menu-item

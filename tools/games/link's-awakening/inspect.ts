@@ -1,5 +1,7 @@
 import { readdirSync } from 'node:fs';
 
+import type { NRecord } from '../../../types';
+import type { ShiftControl } from '../../parsers/nintendo/message-studio/format';
 import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect';
 import { MSBP } from '../../parsers/nintendo/message-studio/msbp';
 
@@ -22,5 +24,39 @@ const result = controlCodes(msbt, {
 		16, // lump (no idea what this is)
 	],
 });
+
+const inconsistent = Object.entries(msbt).reduce<NRecord<string, Array<string | ShiftControl>, 3>>(
+	(result, [locale, files]) => {
+		Object.entries(files).forEach(([filename, msbt]) => {
+			const indices = msbt.blocks.TXT2?.map((message, blockIndex) => {
+				return message.findIndex((part, messageIndex) => {
+					if (typeof part === 'object' && part.group === 1 && part.tag === 4) {
+						const next = message[messageIndex + 1];
+						if ((typeof next === 'object' && next.tag !== 4) || (typeof next === 'string' && next[0] !== '\n')) {
+							return true;
+						}
+					}
+
+					return false;
+				}) >= 0
+					? blockIndex
+					: null;
+			}).filter((x): x is number => typeof x === 'number');
+
+			if (indices?.length) {
+				const mappedFiles = result[locale] ?? {};
+				mappedFiles[filename] = Object.fromEntries(
+					indices.map((index) => {
+						return [msbt.blocks.LBL1?.[index], msbt.blocks.TXT2?.[index]];
+					}),
+				);
+				result[locale] = mappedFiles;
+			}
+		});
+
+		return result;
+	},
+	{},
+);
 
 void 0;

@@ -1,0 +1,3 @@
+.placeholder::before {
+	content: '＃';
+}

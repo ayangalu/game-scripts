@@ -1,0 +1,27 @@
+td {
+	background-color: slategrey;
+	border: 1px solid rgb(var(--sl-color-gray-300));
+	color: white;
+}
+
+td[lang] {
+	color: #ededed;
+	text-shadow: 1px 1px 2px hsl(0 0% 0%);
+}
+
+td:is([lang|='ja'], [lang|='ko'], [lang|='zh']) {
+	text-align: center;
+}
+
+td hr {
+	border: none;
+	border-top: 1px dashed rgb(var(--sl-color-gray-300));
+}
+
+td ul {
+	white-space: initial;
+	/* looks weird in Chromium without */
+	display: flex;
+	flex-direction: column;
+	place-items: center;
+}

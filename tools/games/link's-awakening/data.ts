@@ -1,6 +1,7 @@
 import type { FormatTree } from '../../parsers/nintendo/message-studio/format';
-import { DataArray, DataType } from '../../parsers/binary';
+import { DataType } from '../../parsers/binary';
 import {
+	processShiftCode,
 	hex,
 	colorFormatter,
 	rubyFormatter,
@@ -9,7 +10,6 @@ import {
 } from '../../parsers/nintendo/message-studio/format';
 
 const colors = {
-	'edededff': 'default',
 	'6cd2ffff': 'info',
 	'df1000ff': 'caution',
 	'd9456dff': 'red',
@@ -92,40 +92,70 @@ export const shiftFormats: FormatTree = {
 			0x0000: rubyFormatter(),
 			0x0003: colorFormatter<string>({
 				colors,
-				reset: '000000ff',
+				reset: ['edededff', '000000ff'],
 				lookup: ({ buffer }) => buffer.toString('hex'),
 			}),
-			0x0004: () => `<hr>`,
+			0x0004: ({ openMarkupTags }) => {
+				if (openMarkupTags.find((selector) => selector === 'ul')) {
+					let markup = '';
+
+					if (openMarkupTags[0] === 'li') {
+						openMarkupTags.shift();
+						markup += `</li>`;
+					}
+
+					openMarkupTags.unshift(`li`);
+					return markup + `<li>`;
+				}
+
+				return '\n';
+			},
 		},
 		0x0001: {
 			0x0000: variableFormatter(
 				1,
 				emoji1,
 				(option) => `[1:0:${hex(option, 4)}]`,
-				(icon) => `<span class="emoji ${icon}"></span>`,
+				(icon) => `<inline-content><span class="emoji ${icon}"></span></inline-content>`,
 			),
 			0x0001: variableFormatter(
 				1,
 				emoji2,
 				(option) => `[1:1:${hex(option, 4)}]`,
-				(icon) => `<span class="emoji ${icon}"></span>`,
+				(icon) => `<inline-content><span class="emoji ${icon}"></span></inline-content>`,
 			),
 			0x0002: ({ parameters }) => {
 				const index = parameters.next(DataType.UInt8);
 				return String.fromCodePoint(0x2460 + index);
 			},
 			0x0003: () => `<player-name character="tloz:link"></player-name>`,
-			0x0007: () => ``, // TODO: selections
+			0x0007: ({ openMarkupTags, reader }) => {
+				let markup = `<hr><ul>`;
+
+				openMarkupTags.unshift('ul');
+
+				const lastOffset = reader.offset;
+
+				if (reader.next(DataType.UInt8) === 0x0a) {
+					markup += `<li>`;
+					openMarkupTags.unshift('li');
+				} else {
+					reader.seek(lastOffset);
+				}
+
+				return markup;
+			},
 			0x000a: () => `<span class="placeholder"></span>`,
 			0x0012: ({ parameters, encoding }) => {
 				const count = parameters.next(DataType.UInt16);
-				return parameters.next(DataArray({ type: 'char', encoding }, count));
+				return parameters.slice(count).next({ type: 'string', encoding });
 			},
 			0x0013: ({ parameters, encoding }) => {
 				const moeumCount = parameters.next(DataType.UInt16);
-				const moeum = parameters.next(DataArray({ type: 'char', encoding }, moeumCount));
+				const moeum = parameters.slice(moeumCount).next({ type: 'string', encoding });
+				parameters.skip(moeumCount);
 				const batchimCount = parameters.next(DataType.UInt16);
-				const batchim = parameters.next(DataArray({ type: 'char', encoding }, batchimCount));
+				const batchim = parameters.slice(batchimCount).next({ type: 'string', encoding });
 				return `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`;
 			},
 		},

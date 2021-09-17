@@ -79,6 +79,10 @@ export function processShiftCode(
 	);
 }
 
+export function closeMarkup(openSelectors: string[]) {
+	return openSelectors.map((tag) => `</${tag.split('.')[0]}>`).join('');
+}
+
 export function hex(value: number, length?: number) {
 	const x = value.toString(16);
 
@@ -125,7 +129,7 @@ export function colorFormatter<T extends string | number>({
 }: {
 	colors: Partial<Record<T, string>>;
 	lookup: (reader: BinaryReader) => T;
-	reset: T;
+	reset: T[];
 }): ShiftOutFormatter {
 	return ({ parameters, openMarkupTags }) => {
 		const option = lookup(parameters);
@@ -137,10 +141,10 @@ export function colorFormatter<T extends string | number>({
 		if (lastTag === 'span' && lastClassList.includes('color')) {
 			openMarkupTags.shift();
 			markup += `</span>`;
+		}
 
-			if (option === reset) {
-				return markup;
-			}
+		if (reset.includes(option)) {
+			return markup;
 		}
 
 		const classList = [
@@ -151,42 +155,6 @@ export function colorFormatter<T extends string | number>({
 		openMarkupTags.unshift(`span.${classList.join('.')}`);
 
 		return markup + `<span class="${classList.join(' ')}">`;
-	};
-}
-
-export function choiceFormatter(index: number): ShiftOutFormatter {
-	return ({ openMarkupTags }) => {
-		let markup = '';
-
-		const moveSpans: string[] = [];
-
-		while (openMarkupTags[0]?.startsWith('span')) {
-			moveSpans.unshift(openMarkupTags.shift()!);
-			markup += `</span>`;
-		}
-
-		if (index === 0) {
-			openMarkupTags.unshift('ul');
-			markup += '<ul>';
-		} else {
-			// expect last tag to be choice item
-			openMarkupTags.shift();
-			markup += `</li>`;
-		}
-
-		const classList = ['choice', `option-${index + 1}`];
-
-		markup += `<li class="${classList.join(' ')}">`;
-
-		for (const selector of moveSpans) {
-			const spanClassList = selector.split('.').slice(1);
-			markup += `<span class="${spanClassList.join(' ')}">`;
-		}
-
-		openMarkupTags.unshift(`li.${classList.join('.')}`);
-		openMarkupTags.unshift(...moveSpans.reverse());
-
-		return markup;
 	};
 }
 
