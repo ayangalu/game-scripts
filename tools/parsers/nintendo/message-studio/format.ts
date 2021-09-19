@@ -161,12 +161,15 @@ export function colorFormatter<T extends string | number>({
 export function variableFormatter<T>(
 	optionLength: number,
 	variables: Partial<Record<number, T>>,
-	unknown: (option: number) => T,
+	unknown: (option: number) => string,
 	template = (variable: T) => `${variable}`,
 ): ShiftOutFormatter {
 	return ({ parameters }) => {
 		const option = parameters.next({ type: 'int', signed: false, bytes: optionLength });
-		return template(variables[option] ?? unknown(option));
+		if (typeof variables[option] !== 'undefined') {
+			return template(variables[option]!);
+		}
+		return unknown(option);
 	};
 }
 

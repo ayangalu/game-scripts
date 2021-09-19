@@ -320,23 +320,24 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 				},
 				0x0002: {
 					0x0000: () => `<player-name character="tloz:link"></player-name>`,
-					0x0001: variableFormatter(2, itemMap[locale], (option) => `[2:1:${hex(option, 4)}]`),
+					0x0001: variableFormatter(2, itemMap[locale], (option) => `<debug-token>2:1:${option}</debug-token>`),
 					0x0002: variableFormatter(
 						4,
 						Array.from({ length: 20 }).map((_, i) => String.fromCodePoint(0x2460 + i)),
-						(option) => `[2:2:${hex(option, 8)}]`,
+						(option) => `<debug-token>2:2:${option}</debug-token>`,
+						(content) => `<span class="placeholder">${content}</span>`,
 					),
-					0x0003: () => `<span class="numeric-placeholder"></span>`,
+					0x0003: () => `<span class="placeholder">＃</span>`,
 					0x0004: variableFormatter(
 						1,
 						emoji[version],
-						(option) => ['unknown', hex(option)],
+						(option) => `<debug-token>2:4:${option}</debug-token>`,
 						(classes) => `<span class="emoji ${classes.join(' ')}"></span>`,
 					),
 					0x0005: variableFormatter(
 						1,
 						controls,
-						(option) => ({ name: ['unknown', hex(option)], parts: [] }),
+						(option) => `<debug-token>2:5:${option}</debug-token>`,
 						({ name, parts }) =>
 							`<span class="controls ${name.join(' ')}">${parts
 								.map((id) => `<span class="${id.join(' ')}"></span>`)
@@ -349,7 +350,7 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 					0x0002: variableFormatter(
 						1,
 						josa,
-						(option) => [`[3:2:${hex(option)}]`, `[3:2:${hex(option)}]`],
+						(option) => `<debug-token>3:2:${option}</debug-token>`,
 						([moeum, batchim]) => `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`,
 					),
 					0x0003: variableFormatter(1, wordMap[locale], (option) => `[3:3:${hex(option)}]`),

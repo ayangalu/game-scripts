@@ -115,14 +115,14 @@ export const shiftFormats: FormatTree = {
 			0x0000: variableFormatter(
 				1,
 				emoji1,
-				(option) => `[1:0:${hex(option, 4)}]`,
-				(icon) => `<inline-content><span class="emoji ${icon}"></span></inline-content>`,
+				(option) => `<debug-token>1:0:${option}</debug-token>`,
+				(icon) => `<span class="emoji ${icon}"></span>`,
 			),
 			0x0001: variableFormatter(
 				1,
 				emoji2,
-				(option) => `[1:1:${hex(option, 4)}]`,
-				(icon) => `<inline-content><span class="emoji ${icon}"></span></inline-content>`,
+				(option) => `<debug-token>1:1:${option}</debug-token>`,
+				(icon) => `<span class="emoji ${icon}"></span>`,
 			),
 			0x0002: ({ parameters }) => {
 				const index = parameters.next(DataType.UInt8);
@@ -145,7 +145,7 @@ export const shiftFormats: FormatTree = {
 
 				return markup;
 			},
-			0x000a: () => `<span class="placeholder"></span>`,
+			0x000a: () => `<span class="placeholder">＃</span>`,
 			0x0012: ({ parameters, encoding }) => {
 				const count = parameters.next(DataType.UInt16);
 				return parameters.slice(count).next({ type: 'string', encoding });
