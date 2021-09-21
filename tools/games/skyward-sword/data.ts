@@ -1,12 +1,12 @@
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
+import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format';
 import { ensure } from '../../ensure';
+import { DataType } from '../../parsers/binary';
 import {
 	capitalizationFormatter,
-	choiceFormatter,
 	colorFormatter,
-	FormatTree,
 	hex,
 	rubyFormatter,
 	ShiftCode,
@@ -195,6 +195,42 @@ const josa = {
 	0x05: ['로', '으로'],
 };
 
+function choiceFormatter(index: number): ShiftOutFormatter {
+	return ({ openMarkupTags }) => {
+		let markup = '';
+
+		const moveSpans: string[] = [];
+
+		while (openMarkupTags[0]?.startsWith('span')) {
+			moveSpans.unshift(openMarkupTags.shift()!);
+			markup += `</span>`;
+		}
+
+		if (index === 0) {
+			openMarkupTags.unshift('ul');
+			markup += '<ul>';
+		} else {
+			// expect last tag to be choice item
+			openMarkupTags.shift();
+			markup += `</li>`;
+		}
+
+		const classList = ['choice', `option-${index + 1}`];
+
+		markup += `<li class="${classList.join(' ')}">`;
+
+		for (const selector of moveSpans) {
+			const spanClassList = selector.split('.').slice(1);
+			markup += `<span class="${spanClassList.join(' ')}">`;
+		}
+
+		openMarkupTags.unshift(`li.${classList.join('.')}`);
+		openMarkupTags.unshift(...moveSpans.reverse());
+
+		return markup;
+	};
+}
+
 function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 	const minimalFormatters = {
 		[ShiftCode.Out]: {
@@ -256,20 +292,24 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 			[ShiftCode.Out]: {
 				0x0000: {
 					0x0000: rubyFormatter(),
-					0x0003: colorFormatter({
-						0x0000: 'emphasis',
-						0x0001: 'warning',
-						0x0002: 'legend',
-						0x0003: 'name',
-						0x0004: 'action',
-						0x0005: 'item',
-						0x0006: 'intro',
-						0x0007: 'rupee-green',
-						0x0008: 'rupee-blue',
-						0x0009: 'rupee-red',
-						0x000a: 'rupee-silver',
-						0x000b: 'rupee-gold',
-						0x000c: 'rupee-baba',
+					0x0003: colorFormatter<number>({
+						lookup: (parameters) => parameters.next(DataType.UInt16),
+						reset: [0xffff],
+						colors: {
+							0x0000: 'emphasis',
+							0x0001: 'warning',
+							0x0002: 'legend',
+							0x0003: 'name',
+							0x0004: 'action',
+							0x0005: 'item',
+							0x0006: 'intro',
+							0x0007: 'rupee-green',
+							0x0008: 'rupee-blue',
+							0x0009: 'rupee-red',
+							0x000a: 'rupee-silver',
+							0x000b: 'rupee-gold',
+							0x000c: 'rupee-baba',
+						},
 					}),
 				},
 				0x0001: {
@@ -280,23 +320,24 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 				},
 				0x0002: {
 					0x0000: () => `<player-name character="tloz:link"></player-name>`,
-					0x0001: variableFormatter(2, itemMap[locale], (option) => `[2:1:${hex(option, 4)}]`),
+					0x0001: variableFormatter(2, itemMap[locale], (option) => `<debug-token>2:1:${option}</debug-token>`),
 					0x0002: variableFormatter(
 						4,
 						Array.from({ length: 20 }).map((_, i) => String.fromCodePoint(0x2460 + i)),
-						(option) => `[2:2:${hex(option, 8)}]`,
+						(option) => `<debug-token>2:2:${option}</debug-token>`,
+						(content) => `<span class="placeholder">${content}</span>`,
 					),
-					0x0003: () => `<span class="numeric-placeholder"></span>`,
+					0x0003: () => `<span class="placeholder">＃</span>`,
 					0x0004: variableFormatter(
 						1,
 						emoji[version],
-						(option) => ['unknown', hex(option)],
+						(option) => `<debug-token>2:4:${option}</debug-token>`,
 						(classes) => `<span class="emoji ${classes.join(' ')}"></span>`,
 					),
 					0x0005: variableFormatter(
 						1,
 						controls,
-						(option) => ({ name: ['unknown', hex(option)], parts: [] }),
+						(option) => `<debug-token>2:5:${option}</debug-token>`,
 						({ name, parts }) =>
 							`<span class="controls ${name.join(' ')}">${parts
 								.map((id) => `<span class="${id.join(' ')}"></span>`)
@@ -309,7 +350,7 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 					0x0002: variableFormatter(
 						1,
 						josa,
-						(option) => [`[3:2:${hex(option)}]`, `[3:2:${hex(option)}]`],
+						(option) => `<debug-token>3:2:${option}</debug-token>`,
 						([moeum, batchim]) => `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`,
 					),
 					0x0003: variableFormatter(1, wordMap[locale], (option) => `[3:3:${hex(option)}]`),

@@ -1,5 +1,5 @@
-.numeric-placeholder::before {
-	content: '＃';
+.numeric-placeholder {
+	user-select: none;
 }
 
 .capitalize {

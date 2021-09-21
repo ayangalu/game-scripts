@@ -84,6 +84,38 @@ export class MessageTable extends LitElement {
 		`;
 	}
 
+	updated() {
+		const lineHeights: Record<string, number> = {};
+
+		for (const cell of this.renderRoot.querySelector('tr')?.querySelectorAll<HTMLElement>('td[lang]') ?? []) {
+			const span = cell.appendChild(document.createElement('span'));
+
+			span.textContent = (() => {
+				if (cell.lang === 'ja-JP') {
+					return 'あ';
+				}
+
+				if (cell.lang === 'ko-KR') {
+					return '해';
+				}
+
+				if (cell.lang.split('-')[0] === 'zh') {
+					return '中';
+				}
+
+				return 'A';
+			})();
+
+			lineHeights[cell.lang] = span.getBoundingClientRect().height;
+
+			cell.removeChild(span);
+		}
+
+		for (const cell of this.renderRoot.querySelectorAll<HTMLElement>('td[lang]')) {
+			cell.style.setProperty('--inline-height', `${lineHeights[cell.lang]}px`);
+		}
+	}
+
 	render() {
 		if (!this.data || !this.locales.length) {
 			return nothing;

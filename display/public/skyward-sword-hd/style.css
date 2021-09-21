@@ -237,75 +237,76 @@
 }
 
 .controls {
+	--height: var(--inline-height, 1em);
+	--factor: calc(var(--height) / 25);
 	display: inline-grid;
 	grid: 'x' 1fr / 1fr;
-	height: 1em;
+	height: var(--height);
 	place-items: center;
 	place-content: center;
-	vertical-align: middle;
+	vertical-align: text-bottom;
 	filter: drop-shadow(0.02em 0.02em 0.04em hsl(0 0% 0%));
 }
 
 .controls > span {
-	/* display: block; */
-	background-size: contain;
+	background-size: cover;
 	grid-area: x;
 }
 
 @keyframes controls-button-hold-arrow {
 	0%,
 	100% {
-		transform: translate(0, -0.42em);
+		transform: translateY(calc((-19 / 2 - 1) * var(--factor)));
 	}
 	70% {
-		transform: translate(0, -0.78em);
+		transform: translateY(calc((-19 / 2 - 10) * var(--factor)));
 	}
 }
 
 :is(.controls.button.hold, .controls.stick.tilt) > .arrow {
 	background-image: url('controls/th_arrow_00.png');
-	width: 0.88em;
-	height: 0.76em;
-	animation: controls-button-hold-arrow 0.666s ease-in-out infinite;
+	width: calc(22 * var(--factor));
+	height: calc(19 * var(--factor));
+	animation: controls-button-hold-arrow 0.666666s ease-in-out infinite;
 }
 
 .controls.button.b.hold {
-	width: 0.76em;
+	width: calc(19 * var(--factor));
 }
 
 .controls.button.b.hold > .button.b {
 	background-image: url('controls/tr_bBtn_01.png');
-	width: 1em;
-	height: 1em;
+	width: calc(25 * var(--factor));
+	height: calc(25 * var(--factor));
 }
 
 .controls.button.l.hold,
 .controls.button.zl.hold {
-	width: 0.88em;
+	width: calc(22 * var(--factor));
+	transform: translateY(calc(2 * var(--factor)));
 }
 
 .controls.button.l.hold > .button.l {
 	background-image: url('controls/tr_lBtn_01.png');
-	width: 1em;
-	height: 1em;
-	transform: translate(-0.01em, -0.05em);
+	width: calc(25 * var(--factor));
+	height: calc(25 * var(--factor));
+	transform: translate(calc(-0.25 * var(--factor)), calc(-2 * var(--factor)));
 }
 
 .controls.button.zl.hold > .button.zl {
 	background-image: url('controls/tr_zlBtn_01.png');
-	width: 1em;
-	height: 1em;
-	transform: translate(-0.012em, -0.06em);
+	width: calc(25 * var(--factor));
+	height: calc(25 * var(--factor));
+	transform: translate(calc((0.2 - 0.5) * var(--factor)), calc(-2 * var(--factor)));
 }
 
 .controls.stick.tilt {
-	width: 0.92em;
+	width: calc(23 * var(--factor));
 }
 
 .controls.stick.tilt > .stick {
-	width: 1em;
-	height: 1em;
-	transform: translate(0, 0.01em);
+	width: calc(25 * var(--factor));
+	height: calc(25 * var(--factor));
 }
 
 .controls.stick.l.tilt > .stick.l {
@@ -320,24 +321,24 @@
 	0%,
 	50%,
 	100% {
-		transform: var(--translate) rotate(var(--rotation-base));
+		transform: rotate(var(--rotation-base));
 	}
 	25% {
-		transform: var(--translate) rotate(calc(var(--rotation-base) + 12deg));
+		transform: rotate(calc(var(--rotation-base) + 12deg));
 	}
 	75% {
-		transform: var(--translate) rotate(calc(var(--rotation-base) - 12deg));
+		transform: rotate(calc(var(--rotation-base) - 12deg));
 	}
 }
 
 .controls.joy-con.shake {
-	width: 1.08em;
-	--translate: translate(-0.01em, 0);
+	width: calc(27 * var(--factor));
+	transform: translateX(calc(-0.25 * var(--factor)));
 }
 
 .controls.joy-con.shake > .joy-con {
-	width: 0.768em;
-	height: 1.28em;
+	width: calc(0.4 * 48 * var(--factor));
+	height: calc(0.4 * 80 * var(--factor));
 	animation: controls-joy-con-shake 0.4s ease-in-out infinite;
 }
 
@@ -352,14 +353,14 @@
 }
 
 .controls.joy-con.r.flick.up {
-	width: 1.62em;
+	width: calc(1.35 * 30 * var(--factor));
 }
 
 .controls.joy-con.r.flick.up > .arrow {
 	background-image: url('controls/th_arrow_03.png');
-	width: 1.215em;
-	height: 1.35em;
-	transform: translate(-0.345em, -0.15em) rotate(70deg);
+	width: calc(1.35 * 1.25 * 18 * var(--factor));
+	height: calc(1.35 * 1.25 * 20 * var(--factor));
+	transform: translate(calc(1.35 * -6.39 * var(--factor)), calc(1.35 * -1.48 * var(--factor))) rotate(70deg);
 }
 
 @keyframes controls-joy-con-r-flick-fade {
@@ -382,28 +383,29 @@
 	--opacity-start: 1;
 	--opacity-end: 0;
 	background-image: url('controls/th_remoCon_10.png');
-	width: 1.0368em;
-	height: 0.648em;
-	transform: translate(0.1728em, 0.3296em);
+	width: calc(1.35 * 0.3 * 64 * var(--factor));
+	height: calc(1.35 * 0.3 * 40 * var(--factor));
+	transform: translate(calc(1.35 * 3.2 * var(--factor)), calc(1.35 * 7.4 * var(--factor)));
 }
 
 .controls.joy-con.r.flick.up > .joy-con.r.up {
 	--opacity-start: 0;
 	--opacity-end: 1;
 	background-image: url('controls/th_remoCon_02.png');
-	width: 0.7128em;
-	height: 1.4256em;
-	transform: translate(0.4606em, -0.0435em);
+	width: calc(1.35 * 0.3 * 44 * var(--factor));
+	height: calc(1.35 * 0.3 * 88 * var(--factor));
+	transform: translate(calc(1.35 * 8.53 * var(--factor)), calc(1.35 * 0.49 * var(--factor)));
 }
 
 .controls.joy-con.r.tilt {
-	width: 1.36em;
+	width: calc(1.25 * 34 * var(--factor));
+	transform: translateY(calc(1.25 * 3.86 * var(--factor)));
 }
 
 .controls.joy-con.r.tilt > .joy-con.r {
-	width: 0.672em;
-	height: 0.9408em;
-	transform: translate(var(--x-offset), 0.1424em);
+	width: calc(1.25 * 0.28 * 60 * var(--factor));
+	height: calc(1.25 * 0.28 * 84 * var(--factor));
+	transform: translate(calc(1.25 * var(--x-offset) * var(--factor)), calc(1.25 * 1.06 * var(--factor)));
 }
 
 @keyframes controls-joy-con-r-tilt-right {
@@ -419,7 +421,7 @@
 }
 
 .controls.joy-con.r.tilt > .joy-con.r.right {
-	--x-offset: 0.04em;
+	--x-offset: 1;
 	background-image: url('controls/th_remoCon_23.png');
 	animation: controls-joy-con-r-tilt-right 2s ease-in-out infinite;
 }
@@ -438,7 +440,7 @@
 }
 
 .controls.joy-con.r.tilt > .joy-con.r.left {
-	--x-offset: -0.06em;
+	--x-offset: -1.5;
 	background-image: url('controls/th_remoCon_22.png');
 	animation: controls-joy-con-r-tilt-left 2s ease-in-out infinite;
 }
@@ -467,44 +469,44 @@
 
 .controls.joy-con.r.tilt > .arrow {
 	background-image: url('controls/th_arrow_04.png');
-	width: 1.408em;
-	height: 0.64em;
-	transform: translate(0.03em, -0.412em);
+	width: calc(1.25 * 0.4 * 88 * var(--factor));
+	height: calc(1.25 * 0.4 * 40 * var(--factor));
+	transform: translate(calc(1.25 * 0.75 * var(--factor)), calc(1.25 * -12.8 * var(--factor)));
 }
 
 .controls.joy-con.r.thrust {
-	width: 1.35em;
+	width: calc(1.25 * 27 * var(--factor));
+	transform: translateY(1.25 * 0.45 * var(--factor));
 }
 
 @keyframes controls-joy-con-r-thrust {
 	0%,
 	40%,
 	100% {
-		transform: translate(0.15em, 0);
+		transform: translate(calc(1.25 * 3 * var(--factor)), 0);
 	}
 	13%,
 	26% {
-		transform: translate(-0.15em, -0.15em);
+		transform: translate(calc(1.25 * -3 * var(--factor)), calc(1.25 * -3 * var(--factor)));
 	}
 }
 
 .controls.joy-con.r.thrust > .joy-con.r {
 	background-image: url('controls/th_remoCon_15.png');
-	width: 1.32em;
-	height: 1.08em;
+	width: calc(1.25 * 0.3 * 88 * var(--factor));
+	height: calc(1.25 * 0.3 * 72 * var(--factor));
 	animation: controls-joy-con-r-thrust 1s ease-in-out infinite;
 }
 
 .controls.joy-con.r.thrust > .arrow {
 	background-image: url('controls/th_arrow_10.png');
-	width: 0.75em;
-	height: 0.875em;
-	transform: translate(0.36em, -0.4em) rotate(-245deg);
+	width: calc(1.25 * 1.25 * 12 * var(--factor));
+	height: calc(1.25 * 1.25 * 14 * var(--factor));
+	transform: translate(calc(1.25 * 7.2 * var(--factor)), calc(1.25 * -7.99 * var(--factor))) rotate(-245deg);
 }
 
 .controls.joy-cons.flick.down {
-	width: 1.35em;
-	transform: translate(0.2em, -0.1em);
+	width: calc(1.25 * 27 * var(--factor));
 }
 
 @keyframes controls-joy-cons-flick-down {
@@ -519,65 +521,65 @@
 	}
 }
 
+.controls.joy-cons.flick.down > .joy-con {
+	height: calc(1.25 * 0.25 * 92 * var(--factor));
+	animation: controls-joy-cons-flick-down 2s ease-in-out infinite;
+}
+
 .controls.joy-cons.flick.down > .joy-con.up {
 	--opacity-start: 1;
 	--opacity-end: 0;
-	width: 0.7em;
-	height: 1.15em;
-	animation: controls-joy-cons-flick-down 2s ease-in-out infinite;
+	width: calc(1.25 * 0.25 * 56 * var(--factor));
 }
 
 .controls.joy-cons.flick.down > .joy-con.down {
 	--opacity-start: 0;
 	--opacity-end: 1;
-	width: 0.85em;
-	height: 1.15em;
-	animation: controls-joy-cons-flick-down 2s ease-in-out infinite;
+	width: calc(1.25 * 0.25 * 68 * var(--factor));
 }
 
 .controls.joy-cons.flick.down > .joy-con.r.up {
 	background-image: url('controls/th_remoCon_24.png');
-	transform: translate(0.25em, 0.0645em);
+	transform: translate(calc(1.25 * 5 * var(--factor)), calc(1.25 * 1.29 * var(--factor)));
 }
 
 .controls.joy-cons.flick.down > .joy-con.l.up {
 	background-image: url('controls/th_nunchaku_04.png');
-	transform: translate(-0.2075em, 0.2245em);
+	transform: translate(calc(1.25 * -4.15 * var(--factor)), calc(1.25 * 4.49 * var(--factor)));
 }
 
 .controls.joy-cons.flick.down > .joy-con.r.down {
 	background-image: url('controls/th_remoCon_25.png');
-	transform: translate(0.15em, 0.118em);
+	transform: translate(calc(1.25 * 3 * var(--factor)), calc(1.25 * 2.36 * var(--factor)));
 }
 
 .controls.joy-cons.flick.down > .joy-con.l.down {
 	background-image: url('controls/th_nunchaku_05.png');
-	transform: translate(-0.341em, 0.278em);
+	transform: translate(calc(1.25 * -6.82 * var(--factor)), calc(1.25 * 5.56 * var(--factor)));
 }
 
 .controls.joy-cons.flick.down > .arrow {
 	background-image: url('controls/th_arrow_17.png');
-	width: 0.92em;
-	height: 0.72em;
-	transform: translate(-0.425em, -0.5em);
+	width: calc(1.25 * 0.2 * 92 * var(--factor));
+	height: calc(1.25 * 0.2 * 72 * var(--factor));
+	transform: translate(calc(1.25 * -8.5 * var(--factor)), calc(1.25 * -10 * var(--factor)));
 }
 
 .controls.joy-cons.swing.left {
-	width: 1.9em;
-	transform: translate(0.05em, 0.1em);
+	width: calc(1.25 * 38 * var(--factor));
 }
 
 .controls.joy-cons.swing.left > .joy-con {
-	width: 1.408em;
-	height: 1.012em;
+	width: calc(1.25 * 0.22 * 128 * var(--factor));
+	height: calc(1.25 * 0.22 * 92 * var(--factor));
 }
 
 .controls.joy-cons.swing.left > .joy-con.l {
-	transform: translate(-0.341em, 0.05em);
+	transform: translate(calc(1.25 * -6.82 * var(--factor)), calc(1.25 * 1 * var(--factor)));
 }
 
 .controls.joy-cons.swing.left > .joy-con.r {
-	transform: translate(0.245em, 0.05em);
+	transform: translate(calc(1.25 * 4.9 * var(--factor)), calc(1.25 * 1 * var(--factor)));
 }
 
 @keyframes controls-joy-cons-swing-left-center {
@@ -657,18 +659,18 @@
 
 .controls.joy-cons.swing.left > .arrow {
 	background-image: url('controls/th_arrow_09.png');
-	width: 0.6em;
-	height: 1.3em;
-	transform: translate(-0.0745em, -0.6395em) rotate(90deg);
+	width: calc(1.25 * 0.25 * 48 * var(--factor));
+	height: calc(1.25 * 0.25 * 104 * var(--factor));
+	transform: translate(calc(1.25 * -1.49 * var(--factor)), calc(1.25 * -12.79 * var(--factor))) rotate(90deg);
 }
 
 .controls.stick:not(.tilt) {
-	width: 1.1em;
+	width: calc(1.25 * 22 * var(--factor));
 }
 
 .controls.stick:not(.tilt) > .stick {
-	width: 1.1em;
-	height: 1.1em;
+	width: calc(1.25 * 22 * var(--factor));
+	height: calc(1.25 * 22 * var(--factor));
 }
 
 @keyframes controls-stick-xy {
@@ -770,7 +772,7 @@
 }
 
 .controls.button.press {
-	width: 0.76em;
+	width: calc(19 * var(--factor));
 }
 
 @keyframes controls-button-press {
@@ -785,8 +787,8 @@
 }
 
 .controls.button.press > .button {
-	width: 1em;
-	height: 1em;
+	width: calc(25 * var(--factor));
+	height: calc(25 * var(--factor));
 	animation: controls-button-press 2s steps(1) infinite;
 }
 

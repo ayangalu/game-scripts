@@ -1,7 +1,7 @@
 import { encode as htmlEncode } from 'html-entities';
 
 import { repeat, DataType } from '../../binary';
-import { FormatTree, isShiftCode, processShiftCode, ShiftControl } from './format';
+import { closeMarkup, FormatTree, isShiftCode, processShiftCode, ShiftControl } from './format';
 import { LMS, processLabelBlock } from './lms';
 
 type Message = Array<string | ShiftControl>;
@@ -22,11 +22,7 @@ export class MSBT extends LMS<Blocks> {
 		);
 	}
 
-	constructor(
-		source: string | Buffer,
-		tagFormatters: FormatTree = {},
-		closeMarkup = (openMarkupTags: string[]) => openMarkupTags.map((tag) => `</${tag.split('.')[0]}>`).join(''),
-	) {
+	constructor(source: string | Buffer, tagFormatters: FormatTree = {}, encode = htmlEncode) {
 		super(source, 'MsgStdBn', [3], {
 			LBL1: processLabelBlock,
 			TSY1: (reader) => {
@@ -38,6 +34,7 @@ export class MSBT extends LMS<Blocks> {
 
 					const openMarkupTags: string[] = [];
 					const message: Message = [];
+
 					let string = '';
 					let char = reader.next({ type: 'char', encoding });
 
@@ -52,7 +49,7 @@ export class MSBT extends LMS<Blocks> {
 
 							message.push(processShiftCode(code, reader, encoding, openMarkupTags, tagFormatters));
 						} else {
-							string += htmlEncode(char);
+							string += encode(char);
 						}
 
 						char = reader.next({ type: 'char', encoding });
