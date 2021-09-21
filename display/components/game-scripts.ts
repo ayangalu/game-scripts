@@ -112,6 +112,10 @@ export class GameScripts extends LitElement {
 		const gameName = currentTarget.value;
 		this.selectedGame = this.games[gameName];
 
+		this.selectedMessages = undefined;
+		this.selectedLocales = [];
+		this.selectedTargetLocale = undefined;
+
 		Object.entries(this.selectedGame.characters ?? {}).forEach(([key, name]) => PlayerName.register(key, name));
 		KoreanJosa.update();
 
