@@ -28,9 +28,13 @@ interface Char {
 	readonly encoding: Encoding;
 }
 
+interface Bool {
+	readonly type: 'bool';
+}
+
 type Numeric = Int | Float;
 
-type Atomic = Numeric | Char;
+type Atomic = Numeric | Char | Bool;
 
 interface DataString {
 	readonly type: 'string';
@@ -55,9 +59,12 @@ interface Struct {
 	[key: string]: DataType;
 }
 
-export type DataType = Atomic | DataArray | DataString /*  | Struct */;
+export type DataType = Atomic | DataArray | DataString;
 
 export const DataType = {
+	Bool: {
+		type: 'bool',
+	},
 	UInt8: {
 		type: 'int',
 		signed: false,
@@ -77,6 +84,36 @@ export const DataType = {
 		type: 'int',
 		signed: false,
 		bytes: 4,
+	},
+	UInt64: {
+		type: 'int',
+		signed: false,
+		bytes: 8,
+	},
+	Int8: {
+		type: 'int',
+		signed: true,
+		bytes: 1,
+	},
+	Int16: {
+		type: 'int',
+		signed: true,
+		bytes: 2,
+	},
+	Int24: {
+		type: 'int',
+		signed: true,
+		bytes: 3,
+	},
+	Int32: {
+		type: 'int',
+		signed: true,
+		bytes: 4,
+	},
+	Int64: {
+		type: 'int',
+		signed: true,
+		bytes: 8,
 	},
 	CharASCII: {
 		type: 'char',
@@ -102,7 +139,11 @@ type Destruct<T extends DataType[] | Struct> = {
 		: T[P] extends DataArray
 		? T[P]['subType'] extends Char
 			? string
+			: T[P]['subType'] extends Bool
+			? boolean[]
 			: number[]
+		: T[P] extends Bool
+		? boolean
 		: T[P] extends Numeric
 		? number
 		: T[P] extends Char | DataString
@@ -127,7 +168,7 @@ export class BinaryReader {
 	}
 
 	readonly buffer: Buffer;
-	readonly bom?: ByteOrder;
+	readonly byteOrder?: ByteOrder;
 
 	constructor(source: string | Buffer) {
 		this.buffer = typeof source === 'string' ? readFileSync(source) : source;
@@ -146,29 +187,31 @@ export class BinaryReader {
 	}
 
 	checkBOM(position: number) {
-		const bom = this.buffer.readUInt16BE(position);
+		const byteOrder = this.buffer.readUInt16BE(position);
 
-		if (bom !== ByteOrder.BigEndian && bom !== ByteOrder.LittleEndian) {
+		if (byteOrder !== ByteOrder.BigEndian && byteOrder !== ByteOrder.LittleEndian) {
 			throw new Error(`invalid byte order mark`);
 		}
 
 		this.#offset = position + 2;
 
-		return this.setByteOrder(bom);
+		return this.setByteOrder(byteOrder);
 	}
 
-	setByteOrder(bom: ByteOrder) {
+	setByteOrder(byteOrder: ByteOrder) {
 		// @ts-expect-error
-		this.bom = bom;
+		this.byteOrder = byteOrder;
 		return this;
 	}
 
 	slice(size: number) {
 		const reader = new BinaryReader(this.buffer.slice(this.#offset, this.#offset + size));
 
-		if (this.bom) {
-			reader.setByteOrder(this.bom);
+		if (this.byteOrder) {
+			reader.setByteOrder(this.byteOrder);
 		}
+
+		this.skip(size);
 
 		return reader;
 	}
@@ -177,10 +220,15 @@ export class BinaryReader {
 		this.#offset += bytes;
 	}
 
+	align(to: number) {
+		this.skip(((-this.#offset % to) + to) % to);
+	}
+
 	seek(position: number) {
 		this.#offset = position;
 	}
 
+	next(dataType: Bool): boolean;
 	next(dataType: Numeric): number;
 	next(dataType: Char | DataString): string;
 	next(dataType: DataArray<Numeric>): number[];
@@ -197,14 +245,18 @@ export class BinaryReader {
 
 		const [dataType] = types;
 
+		if (dataType.type === 'bool') {
+			return Boolean(this.next(DataType.UInt8));
+		}
+
 		if (dataType.type === 'int') {
-			if (dataType.bytes > 1 && !this.bom) {
+			if (dataType.bytes > 1 && !this.byteOrder) {
 				throw new Error(`need byte order for reading values longer than one byte`);
 			}
 
 			let method;
 
-			if (this.bom === ByteOrder.BigEndian) {
+			if (this.byteOrder === ByteOrder.BigEndian) {
 				method = dataType.signed ? this.buffer.readIntBE : this.buffer.readUIntBE;
 			} else {
 				method = dataType.signed ? this.buffer.readIntLE : this.buffer.readUIntLE;
@@ -217,13 +269,13 @@ export class BinaryReader {
 		}
 
 		if (dataType.type === 'float') {
-			if (!this.bom) {
+			if (!this.byteOrder) {
 				throw new Error(`need byte order for reading float values`);
 			}
 
 			let method;
 
-			if (this.bom === ByteOrder.BigEndian) {
+			if (this.byteOrder === ByteOrder.BigEndian) {
 				method = dataType.bytes === 4 ? this.buffer.readFloatBE : this.buffer.readDoubleBE;
 			} else {
 				method = dataType.bytes === 4 ? this.buffer.readFloatLE : this.buffer.readDoubleLE;

@@ -62,7 +62,6 @@ export function processShiftCode(
 		const parameterByteCount = reader.next(DataType.UInt16);
 		// @ts-expect-error
 		control.parameters = reader.slice(parameterByteCount);
-		reader.skip(parameterByteCount);
 	}
 
 	const format = tagFormatters[code]?.[control.group]?.[control.tag];

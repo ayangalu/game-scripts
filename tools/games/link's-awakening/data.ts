@@ -153,7 +153,6 @@ export const shiftFormats: FormatTree = {
 			0x0013: ({ parameters, encoding }) => {
 				const moeumCount = parameters.next(DataType.UInt16);
 				const moeum = parameters.slice(moeumCount).next({ type: 'string', encoding });
-				parameters.skip(moeumCount);
 				const batchimCount = parameters.next(DataType.UInt16);
 				const batchim = parameters.slice(batchimCount).next({ type: 'string', encoding });
 				return `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`;

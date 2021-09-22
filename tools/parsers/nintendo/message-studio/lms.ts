@@ -72,11 +72,10 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 				// @ts-expect-error
 				this.blocks[name] = processor(reader.slice(size), this.encoding);
 			} else {
-				// console.log(`unknown block: ${name}`);
+				reader.skip(size);
 			}
 
-			const padding = ((-size % 0x10) + 0x10) % 0x10;
-			reader.skip(size + padding);
+			reader.align(0x10);
 		});
 	}
 
