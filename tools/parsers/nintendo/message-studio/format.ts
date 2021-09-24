@@ -1,6 +1,6 @@
 import { encode as htmlEncode } from 'html-entities';
 
-import { BinaryReader, DataType, Encoding } from '../../binary';
+import { BinaryReader, DataType, Encoding, SafeIntBytes } from '../../binary';
 
 export const enum ShiftCode {
 	Out = 0xe,
@@ -158,7 +158,7 @@ export function colorFormatter<T extends string | number>({
 }
 
 export function variableFormatter<T>(
-	optionLength: number,
+	optionLength: SafeIntBytes,
 	variables: Partial<Record<number, T>>,
 	unknown: (option: number) => string,
 	template = (variable: T) => `${variable}`,

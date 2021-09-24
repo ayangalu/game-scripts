@@ -12,34 +12,40 @@ export const enum Encoding {
 	UTF32 = 'utf-32',
 }
 
-interface Int {
+export type SafeIntBytes = 1 | 2 | 3 | 4 | 5 | 6;
+
+interface DataInt {
 	readonly type: 'int';
+	readonly signed: boolean;
+	readonly bytes: SafeIntBytes;
+}
+
+interface DataBigInt {
+	readonly type: 'bigint';
 	readonly signed: boolean;
 	readonly bytes: number;
 }
 
-interface Float {
+interface DataFloat {
 	readonly type: 'float';
 	readonly bytes: 4 | 8;
 }
 
-interface Char {
+interface DataChar {
 	readonly type: 'char';
 	readonly encoding: Encoding;
 }
 
-interface Bool {
+interface DataBool {
 	readonly type: 'bool';
 }
-
-type Numeric = Int | Float;
-
-type Atomic = Numeric | Char | Bool;
 
 interface DataString {
 	readonly type: 'string';
 	readonly encoding: Encoding;
 }
+
+type Atomic = DataInt | DataBigInt | DataFloat | DataChar | DataBool;
 
 interface DataArray<T extends Atomic = Atomic> {
 	readonly type: 'array';
@@ -55,11 +61,7 @@ export function DataArray<T extends Atomic>(type: T, count: number): DataArray<T
 	};
 }
 
-interface Struct {
-	[key: string]: DataType;
-}
-
-export type DataType = Atomic | DataArray | DataString;
+export type DataType = Atomic | DataString;
 
 export const DataType = {
 	Bool: {
@@ -75,18 +77,28 @@ export const DataType = {
 		signed: false,
 		bytes: 2,
 	},
-	UInt24: {
-		type: 'int',
-		signed: false,
-		bytes: 3,
-	},
 	UInt32: {
 		type: 'int',
 		signed: false,
 		bytes: 4,
 	},
-	UInt64: {
-		type: 'int',
+	BigUInt8: {
+		type: 'bigint',
+		signed: false,
+		bytes: 1,
+	},
+	BigUInt16: {
+		type: 'bigint',
+		signed: false,
+		bytes: 2,
+	},
+	BigUInt32: {
+		type: 'bigint',
+		signed: false,
+		bytes: 4,
+	},
+	BigUInt64: {
+		type: 'bigint',
 		signed: false,
 		bytes: 8,
 	},
@@ -100,18 +112,28 @@ export const DataType = {
 		signed: true,
 		bytes: 2,
 	},
-	Int24: {
-		type: 'int',
-		signed: true,
-		bytes: 3,
-	},
 	Int32: {
 		type: 'int',
 		signed: true,
 		bytes: 4,
 	},
-	Int64: {
-		type: 'int',
+	BigInt8: {
+		type: 'bigint',
+		signed: true,
+		bytes: 1,
+	},
+	BigInt16: {
+		type: 'bigint',
+		signed: true,
+		bytes: 2,
+	},
+	BigInt32: {
+		type: 'bigint',
+		signed: true,
+		bytes: 4,
+	},
+	BigInt64: {
+		type: 'bigint',
 		signed: true,
 		bytes: 8,
 	},
@@ -133,22 +155,18 @@ export const DataType = {
 	},
 } as const;
 
-type Destruct<T extends DataType[] | Struct> = {
-	[P in keyof T]: T[P] extends Struct
-		? Destruct<T[P]>
-		: T[P] extends DataArray
-		? T[P]['subType'] extends Char
-			? string
-			: T[P]['subType'] extends Bool
-			? boolean[]
-			: number[]
-		: T[P] extends Bool
-		? boolean
-		: T[P] extends Numeric
-		? number
-		: T[P] extends Char | DataString
-		? string
-		: never;
+type Read<T extends DataType> = T extends DataInt | DataFloat
+	? number
+	: T extends DataBigInt
+	? bigint
+	: T extends DataBool
+	? boolean
+	: string;
+
+type ReadArray<T extends Atomic> = T extends DataChar ? string : Array<Read<T>>;
+
+type ReadStruct<T extends DataType[]> = {
+	[P in keyof T]: T[P] extends DataArray ? ReadArray<T[P]['subType']> : T[P] extends DataType ? Read<T[P]> : never;
 };
 
 export function repeat<T>(times: number, callback: () => T) {
@@ -228,18 +246,16 @@ export class BinaryReader {
 		this.#offset = position;
 	}
 
-	next(dataType: Bool): boolean;
-	next(dataType: Numeric): number;
-	next(dataType: Char | DataString): string;
-	next(dataType: DataArray<Numeric>): number[];
-	next(dataType: DataArray<Char>): string;
-	next<T extends DataType[]>(...struct: T): Destruct<T>;
-	next(...types: DataType[]): any {
+	next<T extends DataType>(dataType: T): Read<T>;
+	next<T extends Atomic>(dataType: DataArray<T>): ReadArray<T>;
+	next<T extends DataType[]>(...struct: T): ReadStruct<T>;
+	next(...types: Array<DataType | DataArray>): any {
 		if (types.length === 0) {
 			throw new Error(`need at least one data type to read`);
 		}
 
 		if (types.length > 1) {
+			// @ts-expect-error
 			return types.map((type) => this.next(type));
 		}
 
@@ -249,22 +265,40 @@ export class BinaryReader {
 			return Boolean(this.next(DataType.UInt8));
 		}
 
-		if (dataType.type === 'int') {
-			if (dataType.bytes > 1 && !this.byteOrder) {
+		if (dataType.type === 'int' || dataType.type === 'bigint') {
+			const { bytes, signed } = dataType;
+
+			if (!Number.isInteger(bytes) || bytes < 1) {
+				throw new Error(`invalid byte count`);
+			}
+
+			if (bytes > 1 && !this.byteOrder) {
 				throw new Error(`need byte order for reading values longer than one byte`);
 			}
 
-			let method;
+			const value = (() => {
+				if (dataType.type === 'int') {
+					if (this.byteOrder === ByteOrder.BigEndian) {
+						return signed ? this.buffer.readIntBE(this.#offset, bytes) : this.buffer.readUIntBE(this.#offset, bytes);
+					}
 
-			if (this.byteOrder === ByteOrder.BigEndian) {
-				method = dataType.signed ? this.buffer.readIntBE : this.buffer.readUIntBE;
-			} else {
-				method = dataType.signed ? this.buffer.readIntLE : this.buffer.readUIntLE;
-			}
+					return signed ? this.buffer.readIntLE(this.#offset, bytes) : this.buffer.readUIntLE(this.#offset, bytes);
+				}
 
-			const value = method.call(this.buffer, this.#offset, dataType.bytes);
-			this.#lastBytesRead = dataType.bytes;
-			this.#offset += dataType.bytes;
+				const byteList = this.buffer.slice(this.#offset, this.#offset + bytes);
+
+				if (this.byteOrder === ByteOrder.BigEndian) {
+					byteList.reverse();
+				}
+
+				const uint = byteList.reduce((result, byte, index) => result + BigInt(byte << (index * 8)), 0n);
+
+				return signed ? BigInt.asIntN(bytes * 8, uint) : uint;
+			})();
+
+			this.#lastBytesRead = bytes;
+			this.#offset += bytes;
+
 			return value;
 		}
 
@@ -289,17 +323,17 @@ export class BinaryReader {
 
 		if (dataType.type === 'char') {
 			if (dataType.encoding === Encoding.ASCII) {
-				return String.fromCharCode(this.next(DataType.UInt8));
+				return String.fromCharCode(Number(this.next(DataType.UInt8)));
 			}
 
 			if (dataType.encoding === Encoding.UTF8) {
-				const byte1 = this.next(DataType.UInt8);
+				const byte1 = Number(this.next(DataType.UInt8));
 
 				if (byte1 < 0x80) {
 					return String.fromCharCode(byte1);
 				}
 
-				const byte2 = this.next(DataType.UInt8);
+				const byte2 = Number(this.next(DataType.UInt8));
 
 				if (byte1 < 0b1110_0000) {
 					if ((byte1 >= 0x80 && byte1 < 0b1100_000) || byte2 >= 0b1100_0000) {
@@ -310,7 +344,7 @@ export class BinaryReader {
 					return String.fromCodePoint(code);
 				}
 
-				const byte3 = this.next(DataType.UInt8);
+				const byte3 = Number(this.next(DataType.UInt8));
 
 				if (byte1 < 0b1111_0000) {
 					if (byte2 >= 0b1100_0000 || byte3 >= 0b1100_0000) {
@@ -321,7 +355,7 @@ export class BinaryReader {
 					return String.fromCodePoint(code);
 				}
 
-				const byte4 = this.next(DataType.UInt8);
+				const byte4 = Number(this.next(DataType.UInt8));
 
 				if (byte1 >= 0b1111_1000 || byte2 >= 0b1100_0000 || byte3 >= 0b1100_0000 || byte4 >= 0b1100_0000) {
 					throw new Error(`invalid utf-8 bytes`);
@@ -338,18 +372,18 @@ export class BinaryReader {
 			}
 
 			if (dataType.encoding === Encoding.UTF16) {
-				return String.fromCharCode(this.next(DataType.UInt16));
+				return String.fromCharCode(Number(this.next(DataType.UInt16)));
 			}
 
 			if (dataType.encoding === Encoding.UTF32) {
-				return String.fromCodePoint(this.next(DataType.UInt32));
+				return String.fromCodePoint(Number(this.next(DataType.UInt32)));
 			}
 
 			throw new Error(`unsuported encoding`);
 		}
 
 		if (dataType.type === 'string') {
-			const charType: Char = { type: 'char', encoding: dataType.encoding };
+			const charType: DataChar = { type: 'char', encoding: dataType.encoding };
 
 			let result = '';
 			let char = this.next(charType);

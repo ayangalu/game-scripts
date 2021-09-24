@@ -6,3 +6,6 @@ romfs
 *.msbt
 *.msbp
 *.msbf
+*.assets
+mainData
+unity*

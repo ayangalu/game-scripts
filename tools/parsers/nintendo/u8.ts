@@ -70,8 +70,11 @@ export class U8 {
 
 			reader.seek(startOffset + index * nodeSize);
 
-			const isDirectory = reader.next(DataType.UInt8);
-			const nameOffset = reader.next(DataType.UInt24);
+			const isDirectory = reader.next(DataType.Bool);
+
+			reader.skip(1);
+
+			const nameOffset = reader.next(DataType.UInt16);
 			const info = reader.next(DataType.UInt32, DataType.UInt32);
 
 			reader.seek(startOffset + nodeCount * nodeSize + nameOffset);
