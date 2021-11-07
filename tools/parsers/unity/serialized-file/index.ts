@@ -1,11 +1,13 @@
+import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { ensure } from '../../../ensure';
 import { BinaryReader, ByteOrder, DataArray, DataType, repeat } from '../../binary';
-import { Asset, AssetType } from './assets';
+import { Asset, AssetType, ResourceManager } from './assets';
 import { Platform } from '../platform';
 import { SerializedType } from './serialized-type';
 import { Version } from './version';
+import { TextAsset } from './assets/text-asset';
 
 export interface AssetEntry {
 	readonly pathId: bigint;
@@ -42,6 +44,7 @@ export class SerializedFile {
 	readonly externals: readonly ExternalFile[];
 	readonly refTypes?: readonly SerializedType[];
 	readonly userInformation?: string;
+	readonly resources?: Map<string, Buffer>;
 
 	constructor(source: string) {
 		const reader = new BinaryReader(source).setByteOrder(ByteOrder.BigEndian);
@@ -219,6 +222,38 @@ export class SerializedFile {
 			this.userInformation = reader.next(DataType.StringUTF8);
 		}
 
-		void 0;
+		const resourceManager = this.entries
+			.map(({ asset }) => asset)
+			.find((asset): asset is ResourceManager => asset instanceof ResourceManager);
+
+		if (resourceManager) {
+			this.resources = new Map(
+				[...resourceManager.resources.entries()].reduce<[string, Buffer][]>((result, [resourcePath, pointer]) => {
+					if (pointer.fileId >= 1 && pointer.fileId <= this.externals.length) {
+						const entry = this.externals[pointer.fileId - 1].file?.entries.find(({ pathId }) => pathId === pointer.pathId);
+
+						if (entry?.asset instanceof TextAsset) {
+							result.push([resourcePath, entry.asset.data]);
+						}
+					}
+
+					return result;
+				}, []),
+			);
+		}
+	}
+
+	extractResources(root: string, filter: (resourcePath: string) => boolean = () => true) {
+		this.resources?.forEach((data, resourcePath) => {
+			if (!filter(resourcePath)) {
+				return;
+			}
+
+			const { base, dir } = path.parse(resourcePath);
+			const targetPath = path.join(root, dir);
+
+			mkdirSync(targetPath, { recursive: true });
+			writeFileSync(path.join(targetPath, base), data);
+		});
 	}
 }
