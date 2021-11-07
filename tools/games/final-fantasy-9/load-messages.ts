@@ -1,12 +1,25 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import csvParse from 'csv-parse/lib/sync';
+
 import { NRecord } from '../../../types';
+import { SerializedFile } from '../../parsers/unity/serialized-file';
 import { Alignment, fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
 import { eventMessageMap } from './assembly-data';
 
 const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;
 const textRoot = path.join(assetsRoot, 'text');
+
+try {
+	readdirSync(textRoot);
+} catch {
+	new SerializedFile(`data/final-fantasy-9/data/mainData`).extractResources(
+		`data/final-fantasy-9/extract`,
+		(resourcePath) =>
+			resourcePath.startsWith('embeddedasset') && ['', '.txt', '.mes'].includes(path.extname(resourcePath)),
+	);
+}
 
 export const raw = readdirSync(textRoot).reduce<NRecord<string, string, 3>>((result, locale) => {
 	const categories: NRecord<string, string, 2> = Object.create(null);
@@ -68,8 +81,9 @@ const simpleSplit = (source: string) =>
 		Object.keys(raw).forEach((locale) => {
 			raw[locale][source][file].split(/(?<=\[ENDN\])/).forEach((name, index) => {
 				const row = main[index] ?? {};
-				row[localeMap[locale]] =
-					file === 'follow.mes' && index >= 8 ? name.slice(1).replace(/%|&/, `<span class="placeholder">＃</span>`) : name;
+				row[localeMap[locale]] = (
+					file === 'follow.mes' && index >= 8 ? name.slice(1).replace(/%|&/, `<span class="placeholder">＃</span>`) : name
+				).replace(/\r\n/g, '\n');
 				main[index] = row;
 			});
 		});
@@ -82,6 +96,30 @@ const simpleSplit = (source: string) =>
 const fieldOrder = [1, ...new Set(Object.values(eventMessageMap))];
 
 export const aligned = {
+	system: {
+		system: (
+			csvParse(readFileSync(path.join(assetsRoot, 'manifest/text/localization.txt')), {
+				skipEmptyLines: true,
+				skipLinesWithEmptyValues: true,
+				relaxColumnCount: true,
+				cast: (value) => value.replace(/\\n/g, '\n'),
+			}) as string[][]
+		)
+			.slice(1)
+			.reduce<NRecord<string, string, 2>>((result, [key, ...data]) => {
+				result[key] = {
+					'en-US': data[0] ?? '',
+					'en-GB': data[1] ?? '',
+					'ja-JP': data[2] ?? '',
+					'es-ES': data[3] ?? '',
+					'fr-FR': data[4] ?? '',
+					'de-DE': data[5] ?? '',
+					'it-IT': data[6] ?? '',
+				};
+
+				return result;
+			}, Object.create(null)),
+	},
 	field: Object.fromEntries(
 		Object.keys(raw.jp.field)
 			.map((file) => {
@@ -89,7 +127,7 @@ export const aligned = {
 					const messages = raw[locale].field[file]?.split(/(?<=\[(?:ENDN|TIME=-?\d+?)\])/);
 
 					if (messages) {
-						result[locale] = messages;
+						result[locale] = messages.map((message) => message.replace(/\r\n/g, '\n'));
 					}
 
 					return result;
@@ -143,4 +181,12 @@ export const aligned = {
 		}, Object.create(null)),
 	},
 	etc: simpleSplit('etc'),
+	title: {
+		warning: [
+			Object.keys(raw).reduce<Record<string, string>>((result, locale) => {
+				result[localeMap[locale]] = raw[locale].title.warning.trim().replace(/\r\n/g, '\n');
+				return result;
+			}, Object.create(null)),
+		],
+	},
 };
