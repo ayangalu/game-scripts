@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 
 import Parser from 'tree-sitter';
-// @ts-expect-error
 import CSharp from 'tree-sitter-c-sharp';
 
 const parser = new Parser();

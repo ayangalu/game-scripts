@@ -1,4 +1,6 @@
-import { BinaryReader, DataType, repeat } from '@nishin/reader';
+import type { BinaryReader } from '@nishin/reader';
+import { repeat, DataType } from '@nishin/reader';
+
 import { Pointer } from '../pointer';
 import { Asset } from './asset';
 

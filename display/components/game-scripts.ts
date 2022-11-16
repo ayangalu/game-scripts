@@ -2,14 +2,13 @@ import type { SlInput, SlMenuItem, SlSelect } from '@shoelace-style/shoelace';
 import { css, html, nothing, LitElement } from 'lit';
 import { customElement, query, queryAll, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
-import { SearchIndexLocation } from '../types';
 
-import SearchWorker from '../worker/search?worker';
-
+import type { SearchIndexLocation } from '../types';
 import type { MessageTable } from './message-table';
 import type { NRecord, TargetEvent } from './types';
-import { PlayerName } from './player-name';
+import SearchWorker from '../worker/search?worker';
 import { KoreanJosa } from './ko-josa';
+import { PlayerName } from './player-name';
 
 export interface GameInfo {
 	root: string;

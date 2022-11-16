@@ -1,8 +1,9 @@
 import { repeat, DataType } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
-import { closeMarkup, FormatTree, isShiftCode, processShiftCode, ShiftControl } from './format';
-import { LMS, processLabelBlock } from './lms';
+import type { FormatTree, ShiftControl } from './format';
+import { closeMarkup, isShiftCode, processShiftCode } from './format';
+import { processLabelBlock, LMS } from './lms';
 
 type Message = Array<string | ShiftControl>;
 

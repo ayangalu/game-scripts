@@ -1,14 +1,15 @@
-import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { BinaryReader, ByteOrder, DataType, Encoding, repeat } from '@nishin/reader';
+import { repeat, BinaryReader, ByteOrder, DataType, Encoding } from '@nishin/reader';
 
+import type { Platform } from '../platform';
+import type { Asset } from './assets';
 import { ensure } from '../../../ensure';
-import { Asset, AssetType, ResourceManager } from './assets';
-import { Platform } from '../platform';
+import { AssetType, ResourceManager } from './assets';
+import { TextAsset } from './assets/text-asset';
 import { SerializedType } from './serialized-type';
 import { Version } from './version';
-import { TextAsset } from './assets/text-asset';
 
 export interface AssetEntry {
 	readonly pathId: bigint;

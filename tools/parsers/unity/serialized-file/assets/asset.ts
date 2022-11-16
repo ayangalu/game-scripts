@@ -1,4 +1,5 @@
-import { BinaryReader, DataType } from '@nishin/reader';
+import type { BinaryReader } from '@nishin/reader';
+import { DataType } from '@nishin/reader';
 
 export abstract class Asset {
 	protected readonly reader: BinaryReader<Buffer>;

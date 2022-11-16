@@ -1,7 +1,7 @@
-import { html, css, nothing, LitElement } from 'lit';
+import { css, html, nothing, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import type { GameInfo } from './game-scripts';
 import type { NRecord, TargetEvent } from './types';

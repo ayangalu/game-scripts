@@ -1,4 +1,6 @@
-import { BinaryReader, DataType } from '@nishin/reader';
+import type { BinaryReader } from '@nishin/reader';
+import { DataType } from '@nishin/reader';
+
 import { Version } from './version';
 
 export class Pointer {

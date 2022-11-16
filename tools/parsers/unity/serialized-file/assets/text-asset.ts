@@ -1,4 +1,5 @@
-import { BinaryReader, DataType } from '@nishin/reader';
+import type { BinaryReader } from '@nishin/reader';
+import { DataType } from '@nishin/reader';
 
 import { Asset } from './asset';
 

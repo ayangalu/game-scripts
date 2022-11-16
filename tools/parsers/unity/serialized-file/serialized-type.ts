@@ -1,4 +1,5 @@
-import { BinaryReader, DataType, Encoding } from '@nishin/reader';
+import type { BinaryReader } from '@nishin/reader';
+import { DataType, Encoding } from '@nishin/reader';
 
 import { TypeTree } from './type-tree';
 import { Version } from './version';

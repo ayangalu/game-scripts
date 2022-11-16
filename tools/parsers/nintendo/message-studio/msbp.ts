@@ -1,6 +1,6 @@
 import { repeat, DataType, Encoding } from '@nishin/reader';
 
-import { LMS, processLabelBlock } from './lms';
+import { processLabelBlock, LMS } from './lms';
 
 type Color = [number, number, number, number];
 

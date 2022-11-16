@@ -1,5 +1,5 @@
-import type { SafeIntBytes } from '@nishin/reader';
-import { BinaryReader, DataType, Encoding } from '@nishin/reader';
+import type { BinaryReader, Encoding, SafeIntBytes } from '@nishin/reader';
+import { DataType } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
 import type { Mutable } from '../../../../types';
