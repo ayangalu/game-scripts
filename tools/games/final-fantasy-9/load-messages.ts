@@ -3,9 +3,10 @@ import path from 'node:path';
 
 import { parse as csvParse } from 'csv-parse/sync';
 
-import { NRecord } from '../../../types';
+import type { NRecord } from '../../../types';
+import type { Alignment } from './alignments';
 import { SerializedFile } from '../../parsers/unity/serialized-file';
-import { Alignment, fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
+import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
 import { eventMessageMap } from './assembly-data';
 
 const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;

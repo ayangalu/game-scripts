@@ -4,9 +4,9 @@ import path from 'node:path';
 import { merge } from 'lodash';
 
 import type { NRecord } from '../../../types';
+import { HtmlTools } from '../../html-tools';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { shiftFormats } from './data';
-import { HtmlTools } from '../../html-tools';
 
 const htmlTools = new HtmlTools('links-awakening');
 

@@ -1,4 +1,4 @@
-import { NRecord } from '../../../types';
+import type { NRecord } from '../../../types';
 import { aligned } from './load-messages';
 
 const find = (text: string) => {

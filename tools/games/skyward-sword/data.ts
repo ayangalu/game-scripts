@@ -10,8 +10,8 @@ import {
 	colorFormatter,
 	hex,
 	rubyFormatter,
-	ShiftCode,
 	variableFormatter,
+	ShiftCode,
 } from '../../parsers/nintendo/message-studio/format';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { U8 } from '../../parsers/nintendo/u8';
