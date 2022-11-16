@@ -1,4 +1,5 @@
-import { BinaryReader, DataType, repeat } from '../../binary';
+import { BinaryReader, DataType, Encoding, repeat } from '@nishin/reader';
+
 import { Version } from './version';
 
 export interface TypeTreeNode {
@@ -16,7 +17,7 @@ export interface TypeTreeNode {
 export class TypeTree {
 	readonly nodes: readonly TypeTreeNode[];
 
-	constructor(reader: BinaryReader, version: number) {
+	constructor(reader: BinaryReader<Buffer>, version: number) {
 		if (version === Version.Unknown10 || version >= Version.Unknown12) {
 			this.nodes = this.readBlob(reader, version);
 		} else {
@@ -24,19 +25,24 @@ export class TypeTree {
 		}
 	}
 
-	private readRecursive(reader: BinaryReader, version: number, nodes: TypeTreeNode[] = [], level = 0): TypeTreeNode[] {
-		const type = reader.next(DataType.StringUTF8);
-		const name = reader.next(DataType.StringUTF8);
-		const size = reader.next(DataType.Int32);
+	private readRecursive(
+		reader: BinaryReader<Buffer>,
+		version: number,
+		nodes: TypeTreeNode[] = [],
+		level = 0,
+	): TypeTreeNode[] {
+		const type = reader.next(DataType.string(Encoding.UTF8)).value;
+		const name = reader.next(DataType.string(Encoding.UTF8)).value;
+		const size = reader.next(DataType.Int32).value;
 
 		if (version === Version.Unknown2) {
 			reader.skip(4);
 		}
 
-		const index = version !== Version.Unknown3 ? reader.next(DataType.Int32) : undefined;
-		const typeFlags = reader.next(DataType.Int32);
-		const nodeVersion = reader.next(DataType.Int32);
-		const metaFlag = version !== Version.Unknown3 ? reader.next(DataType.Int32) : undefined;
+		const index = version !== Version.Unknown3 ? reader.next(DataType.Int32).value : undefined;
+		const typeFlags = reader.next(DataType.Int32).value;
+		const nodeVersion = reader.next(DataType.Int32).value;
+		const metaFlag = version !== Version.Unknown3 ? reader.next(DataType.Int32).value : undefined;
 
 		nodes.push({
 			type,
@@ -49,29 +55,29 @@ export class TypeTree {
 			level,
 		});
 
-		repeat(reader.next(DataType.Int32), () => this.readRecursive(reader, version, nodes, level + 1));
+		repeat(reader.next(DataType.Int32).value, () => this.readRecursive(reader, version, nodes, level + 1));
 
 		return nodes;
 	}
 
-	private readBlob(reader: BinaryReader, version: number): TypeTreeNode[] {
+	private readBlob(reader: BinaryReader<Buffer>, version: number): TypeTreeNode[] {
 		const offsets = new Map<TypeTreeNode, { type: number; name: number }>();
-		const nodeCount = reader.next(DataType.Int32);
-		const stringBufferSize = reader.next(DataType.Int32);
+		const nodeCount = reader.next(DataType.Int32).value;
+		const stringBufferSize = reader.next(DataType.Int32).value;
 
 		const nodes = repeat(nodeCount, () => {
-			const nodeVersion = reader.next(DataType.UInt16);
-			const level = reader.next(DataType.UInt8);
-			const typeFlags = reader.next(DataType.UInt8);
+			const nodeVersion = reader.next(DataType.Uint16).value;
+			const level = reader.next(DataType.Uint8).value;
+			const typeFlags = reader.next(DataType.Uint8).value;
 
 			const offset = {
-				type: reader.next(DataType.UInt32),
-				name: reader.next(DataType.UInt32),
+				type: reader.next(DataType.Uint32).value,
+				name: reader.next(DataType.Uint32).value,
 			};
 
-			const size = reader.next(DataType.Int32);
-			const index = reader.next(DataType.Int32);
-			const metaFlag = reader.next(DataType.Int32);
+			const size = reader.next(DataType.Int32).value;
+			const index = reader.next(DataType.Int32).value;
+			const metaFlag = reader.next(DataType.Int32).value;
 
 			const node: TypeTreeNode = {
 				type: '',
@@ -86,7 +92,7 @@ export class TypeTree {
 
 			if (version >= Version.TypeTreeNodeWithTypeFlags) {
 				// @ts-expect-error
-				node.referenceTypeHash = reader.next(DataType.BigUInt64);
+				node.referenceTypeHash = reader.next(DataType.BigUint64).value;
 			}
 
 			offsets.set(node, offset);
@@ -112,10 +118,10 @@ export class TypeTree {
 		return nodes;
 	}
 
-	private readBlobString(reader: BinaryReader, value: number) {
+	private readBlobString(reader: BinaryReader<Buffer>, value: number) {
 		if (!(value & 0x80000000)) {
 			reader.seek(value);
-			return reader.next(DataType.StringUTF8);
+			return reader.next(DataType.string(Encoding.UTF8)).value;
 		}
 
 		throw new Error(`TODO?: lookup common strings`);

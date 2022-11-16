@@ -1,8 +1,7 @@
+import { DataType } from '@nishin/reader';
+
 import type { FormatTree } from '../../parsers/nintendo/message-studio/format';
-import { DataType } from '../../parsers/binary';
 import {
-	processShiftCode,
-	hex,
 	colorFormatter,
 	rubyFormatter,
 	variableFormatter,
@@ -125,7 +124,7 @@ export const shiftFormats: FormatTree = {
 				(icon) => `<span class="emoji ${icon}"></span>`,
 			),
 			0x0002: ({ parameters }) => {
-				const index = parameters.next(DataType.UInt8);
+				const index = parameters.next(DataType.Uint8).value;
 				return String.fromCodePoint(0x2460 + index);
 			},
 			0x0003: () => `<player-name character="tloz:link"></player-name>`,
@@ -136,7 +135,7 @@ export const shiftFormats: FormatTree = {
 
 				const lastOffset = reader.offset;
 
-				if (reader.next(DataType.UInt8) === 0x0a) {
+				if (reader.next(DataType.Uint8).value === 0x0a) {
 					markup += `<li>`;
 					openMarkupTags.unshift('li');
 				} else {
@@ -147,14 +146,14 @@ export const shiftFormats: FormatTree = {
 			},
 			0x000a: () => `<span class="placeholder">＃</span>`,
 			0x0012: ({ parameters, encoding }) => {
-				const count = parameters.next(DataType.UInt16);
-				return parameters.slice(count).next({ type: 'string', encoding });
+				const count = parameters.next(DataType.Uint16).value;
+				return parameters.slice(count).next(DataType.string(encoding)).value;
 			},
 			0x0013: ({ parameters, encoding }) => {
-				const moeumCount = parameters.next(DataType.UInt16);
-				const moeum = parameters.slice(moeumCount).next({ type: 'string', encoding });
-				const batchimCount = parameters.next(DataType.UInt16);
-				const batchim = parameters.slice(batchimCount).next({ type: 'string', encoding });
+				const moeumCount = parameters.next(DataType.Uint16).value;
+				const moeum = parameters.slice(moeumCount).next(DataType.string(encoding)).value;
+				const batchimCount = parameters.next(DataType.Uint16).value;
+				const batchim = parameters.slice(batchimCount).next(DataType.string(encoding)).value;
 				return `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`;
 			},
 		},

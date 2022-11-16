@@ -1,5 +1,5 @@
 import type { CheerioAPI } from 'cheerio';
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 
 import type { NRecord, SearchIndexLocation } from '../types';
 
@@ -49,8 +49,8 @@ function buildIndex() {
 				Object.entries(messages).forEach(([locale, message]) => {
 					const location = { group, file, label, locale, message };
 
-					const rb = rubyBase(cheerio.load(message));
-					const rt = rubyText(cheerio.load(message));
+					const rb = rubyBase(load(message));
+					const rt = rubyText(load(message));
 
 					if (rb) {
 						const locations = locationMap[rb];

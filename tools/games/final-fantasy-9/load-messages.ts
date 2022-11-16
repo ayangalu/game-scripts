@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import csvParse from 'csv-parse/lib/sync';
+import { parse as csvParse } from 'csv-parse/sync';
 
 import { NRecord } from '../../../types';
 import { SerializedFile } from '../../parsers/unity/serialized-file';
@@ -100,7 +100,7 @@ export const aligned = {
 		system: (
 			csvParse(readFileSync(path.join(assetsRoot, 'manifest/text/localization.txt')), {
 				skipEmptyLines: true,
-				skipLinesWithEmptyValues: true,
+				skipRecordsWithEmptyValues: true,
 				relaxColumnCount: true,
 				cast: (value) => value.replace(/\\n/g, '\n'),
 			}) as string[][]

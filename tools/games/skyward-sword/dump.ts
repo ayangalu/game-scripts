@@ -1,22 +1,15 @@
-import { execSync } from 'node:child_process';
-import { readdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { Report } from 'html-validate';
 import { merge, mergeWith } from 'lodash';
 
 import type { NRecord } from '../../../types';
 import { U8 } from '../../parsers/nintendo/u8';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { data } from './data';
+import { HtmlTools } from '../../html-tools';
 
-const htmlCache: string[] = (() => {
-	try {
-		return JSON.parse(readFileSync('.cache/valid-html.json', 'utf-8'));
-	} catch {
-		return [];
-	}
-})();
+const htmlTools = new HtmlTools('skyward-sword');
 
 const lineCounts: Record<string, number> = {
 	de: 4,
@@ -59,7 +52,6 @@ const lineCounts: Record<string, number> = {
 					for (const entry of msbt.entries) {
 						const [text, choices] = entry.value.split(/(?=<ul>)/);
 
-						// @ts-expect-error
 						const n = lineCounts[new Intl.Locale(locale).language];
 						const lines = text.split('\n');
 
@@ -102,15 +94,14 @@ const lineCounts: Record<string, number> = {
 
 						const markup = choices ? `${blocks}<hr>${choices}` : blocks;
 
-						if (!htmlCache.includes(markup)) {
-							const report: Report = JSON.parse(
-								execSync(`node tools/validate-html.js ${JSON.stringify(markup)}`, { encoding: 'utf-8' }),
-							);
+						if (!htmlTools.cache.includes(markup)) {
+							const report = htmlTools.validate(markup);
 
 							if (report.valid) {
-								htmlCache.push(markup);
+								htmlTools.cache.push(markup);
 							} else {
-								writeFileSync('.cache/valid-html.json', JSON.stringify(htmlCache));
+								console.log(`ERROR: ${locale} ${file.name} ${entry.label}`);
+								htmlTools.persistCache();
 								throw new Error(report.results[0].messages[0].message);
 							}
 						}
@@ -142,4 +133,4 @@ const lineCounts: Record<string, number> = {
 	);
 });
 
-writeFileSync('.cache/valid-html.json', JSON.stringify(htmlCache));
+htmlTools.persistCache();

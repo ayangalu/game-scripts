@@ -1,27 +1,16 @@
-import { execSync } from 'node:child_process';
-import { readdirSync, writeFileSync, readFileSync, mkdirSync } from 'node:fs';
+import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { Report } from 'html-validate';
 import { merge } from 'lodash';
 
 import type { NRecord } from '../../../types';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { shiftFormats } from './data';
+import { HtmlTools } from '../../html-tools';
 
-const cacheDir = `.cache/link's-awakening`;
-const cacheFile = path.join(cacheDir, 'valid-html.json');
+const htmlTools = new HtmlTools('links-awakening');
 
-const htmlCache: string[] = (() => {
-	try {
-		return JSON.parse(readFileSync(cacheFile, 'utf-8'));
-	} catch {
-		mkdirSync(cacheDir, { recursive: true });
-		return [];
-	}
-})();
-
-const sourceRoot = `data/link's-awakening/messages`;
+const sourceRoot = `data/links-awakening/messages`;
 const targetRoot = `display/public/links-awakening`;
 
 try {
@@ -34,15 +23,14 @@ try {
 					const msbt = new MSBT(path.join(languageRoot, filename), shiftFormats);
 
 					for (const entry of msbt.entries) {
-						if (!htmlCache.includes(entry.value)) {
-							const report: Report = JSON.parse(
-								execSync(`node tools/validate-html.js ${JSON.stringify(entry.value)}`, { encoding: 'utf-8' }),
-							);
+						if (!htmlTools.cache.includes(entry.value)) {
+							const report = htmlTools.validate(entry.value);
 
 							if (report.valid) {
-								htmlCache.push(entry.value);
+								htmlTools.cache.push(entry.value);
 							} else {
 								console.log(`ERROR: ${locale} ${filename} ${entry.label}`);
+								htmlTools.persistCache();
 								throw new Error(report.results[0].messages[0].message);
 							}
 						}
@@ -65,5 +53,5 @@ try {
 
 	writeFileSync(path.join(targetRoot, 'message.json'), JSON.stringify(merge({}, ...messages)));
 } finally {
-	writeFileSync(cacheFile, JSON.stringify(htmlCache));
+	htmlTools.persistCache();
 }

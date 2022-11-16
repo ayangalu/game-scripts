@@ -1,3 +1,7 @@
+export type Mutable<T> = {
+	-readonly [P in keyof T]: T[P];
+};
+
 export type NTuple<T, N extends number, A extends unknown[] = []> = A extends { length: N }
 	? A
 	: NTuple<T, N, [...A, T]>;

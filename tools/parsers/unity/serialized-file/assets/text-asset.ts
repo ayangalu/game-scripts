@@ -1,14 +1,16 @@
-import { BinaryReader, DataArray, DataType } from '../../../binary';
+import { BinaryReader, DataType } from '@nishin/reader';
+
 import { Asset } from './asset';
 
 export class TextAsset extends Asset {
 	readonly name: string;
 	readonly data: Buffer;
 
-	constructor(reader: BinaryReader, version: number, platform: number) {
+	constructor(reader: BinaryReader<Buffer>, version: number, platform: number) {
 		super(reader, version, platform);
 		// TODO: EditorExtension
 		this.name = this.readAlignedString();
-		this.data = Buffer.from(reader.next(DataArray(DataType.UInt8, reader.next(DataType.Int32))));
+		const bufferSize = reader.next(DataType.Int32).value;
+		this.data = Buffer.from(reader.next(DataType.array(DataType.Uint8, bufferSize)).value);
 	}
 }

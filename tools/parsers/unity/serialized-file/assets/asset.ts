@@ -1,24 +1,24 @@
-import { BinaryReader, DataArray, DataType } from '../../../binary';
+import { BinaryReader, DataType } from '@nishin/reader';
 
 export abstract class Asset {
-	protected readonly reader: BinaryReader;
+	protected readonly reader: BinaryReader<Buffer>;
 	protected readonly version: number;
 	protected readonly platform: number;
 
-	constructor(reader: BinaryReader, version: number, platform: number) {
+	constructor(reader: BinaryReader<Buffer>, version: number, platform: number) {
 		this.reader = reader;
 		this.version = version;
 		this.platform = platform;
 	}
 
 	protected readAlignedString() {
-		const length = this.reader.next(DataType.Int32);
+		const length = this.reader.next(DataType.Int32).value;
 
-		if (length <= 0 || length > this.reader.buffer.length - this.reader.offset) {
+		if (length <= 0 || length > this.reader.byteLength - this.reader.offset) {
 			return '';
 		}
 
-		const data = this.reader.next(DataArray(DataType.UInt8, length));
+		const data = this.reader.next(DataType.array(DataType.Uint8, length)).value;
 
 		this.reader.align(4);
 

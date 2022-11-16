@@ -1,4 +1,5 @@
-import { BinaryReader, DataArray, DataType } from '../../binary';
+import { BinaryReader, DataType, Encoding } from '@nishin/reader';
+
 import { TypeTree } from './type-tree';
 import { Version } from './version';
 
@@ -12,10 +13,10 @@ export class SerializedType {
 	readonly reference?: { className: string; namespace: string; asmName: string };
 	readonly dependencies?: readonly number[];
 
-	constructor(reader: BinaryReader, version: number, hasTypeTree: boolean, readonly isReferenceType: boolean) {
-		this.classId = reader.next(DataType.Int32);
-		this.isStripped = version >= Version.RefactoredClassId && reader.next(DataType.Bool);
-		this.scriptTypeIndex = version >= Version.RefactorTypeData ? reader.next(DataType.Int16) : -1;
+	constructor(reader: BinaryReader<Buffer>, version: number, hasTypeTree: boolean, readonly isReferenceType: boolean) {
+		this.classId = reader.next(DataType.Int32).value;
+		this.isStripped = version >= Version.RefactoredClassId && reader.next(DataType.Boolean).value;
+		this.scriptTypeIndex = version >= Version.RefactorTypeData ? reader.next(DataType.Int16).value : -1;
 
 		this.scriptId = [];
 		this.oldTypeHash = [];
@@ -26,10 +27,10 @@ export class SerializedType {
 				(version < Version.RefactoredClassId && this.classId < 0) ||
 				(version >= Version.RefactoredClassId && this.classId === 114)
 			) {
-				this.scriptId = reader.next(DataArray(DataType.UInt8, 16));
+				this.scriptId = reader.next(DataType.array(DataType.Uint8, 16)).value;
 			}
 
-			this.oldTypeHash = reader.next(DataArray(DataType.UInt8, 16));
+			this.oldTypeHash = reader.next(DataType.array(DataType.Uint8, 16)).value;
 		}
 
 		if (hasTypeTree) {
@@ -38,12 +39,13 @@ export class SerializedType {
 			if (version >= Version.StoresTypeDependencies) {
 				if (isReferenceType) {
 					this.reference = {
-						className: reader.next(DataType.StringUTF8),
-						namespace: reader.next(DataType.StringUTF8),
-						asmName: reader.next(DataType.StringUTF8),
+						className: reader.next(DataType.string(Encoding.UTF8)).value,
+						namespace: reader.next(DataType.string(Encoding.UTF8)).value,
+						asmName: reader.next(DataType.string(Encoding.UTF8)).value,
 					};
 				} else {
-					this.dependencies = reader.next(DataArray(DataType.Int32, reader.next(DataType.UInt32)));
+					const length = reader.next(DataType.Uint32).value;
+					this.dependencies = reader.next(DataType.array(DataType.Int32, length)).value;
 				}
 			}
 		}

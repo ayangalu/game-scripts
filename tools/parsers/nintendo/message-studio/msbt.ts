@@ -1,6 +1,6 @@
+import { repeat, DataType } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
-import { repeat, DataType } from '../../binary';
 import { closeMarkup, FormatTree, isShiftCode, processShiftCode, ShiftControl } from './format';
 import { LMS, processLabelBlock } from './lms';
 
@@ -26,17 +26,17 @@ export class MSBT extends LMS<Blocks> {
 		super(source, 'MsgStdBn', [3], {
 			LBL1: processLabelBlock,
 			TSY1: (reader) => {
-				return repeat(reader.buffer.length / 4, () => reader.next(DataType.UInt32));
+				return repeat(reader.buffer.length / 4, () => reader.next(DataType.Uint32).value);
 			},
 			TXT2: (reader, encoding) => {
-				return repeat(reader.next(DataType.UInt32), () => reader.next(DataType.UInt32)).map((offset) => {
+				return repeat(reader.next(DataType.Uint32).value, () => reader.next(DataType.Uint32).value).map((offset) => {
 					reader.seek(offset);
 
 					const openMarkupTags: string[] = [];
 					const message: Message = [];
 
 					let string = '';
-					let char = reader.next({ type: 'char', encoding });
+					let char = reader.next(DataType.char(encoding)).value;
 
 					while (char !== '\0') {
 						const code = char.codePointAt(0);
@@ -52,7 +52,7 @@ export class MSBT extends LMS<Blocks> {
 							string += encode(char);
 						}
 
-						char = reader.next({ type: 'char', encoding });
+						char = reader.next(DataType.char(encoding)).value;
 					}
 
 					if (string) {
