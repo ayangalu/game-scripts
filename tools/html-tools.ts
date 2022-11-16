@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { encode as htmlEncode } from 'html-entities';
 import { HtmlValidate } from 'html-validate';
 
 const htmlValidate = new HtmlValidate({
@@ -26,6 +27,10 @@ export class HtmlTools {
 				return [];
 			}
 		})();
+	}
+
+	encode(text: string) {
+		return htmlEncode(text);
 	}
 
 	validate(template: string) {

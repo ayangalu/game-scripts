@@ -28,13 +28,13 @@ const [tags, qualifiers] = Object.entries(aligned).reduce<[Record<string, any>, 
 
 						if (tagMatch) {
 							const [_, tagName, option] = tagMatch;
-							const tag = result[0][tagName] ?? {};
-							const destinations = tag[option ?? ''] ?? {};
+							const tag = result[0][tagName] ?? Object.create(null);
+							const destinations = tag[option ?? ''] ?? Object.create(null);
 							destinations[destination] = message;
 							tag[option ?? ''] = destinations;
 							result[0][tagName] = tag;
 						} else {
-							const qualifier = result[1][code] ?? {};
+							const qualifier = result[1][code] ?? Object.create(null);
 							qualifier[destination] = message;
 							result[1][code] = qualifier;
 						}

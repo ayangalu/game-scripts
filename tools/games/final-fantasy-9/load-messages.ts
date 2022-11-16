@@ -7,7 +7,7 @@ import type { NRecord } from '../../../types';
 import type { Alignment } from './alignments';
 import { SerializedFile } from '../../parsers/unity/serialized-file';
 import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
-import { eventMessageMap } from './assembly-data';
+import { eventMessageMap, mogIconOpCode } from './assembly-data';
 
 const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;
 const textRoot = path.join(assetsRoot, 'text');
@@ -84,7 +84,7 @@ const simpleSplit = (source: string) =>
 				const row = main[index] ?? {};
 				row[localeMap[locale]] = (
 					file === 'follow.mes' && index >= 8 ? name.slice(1).replace(/%|&/, `<span class="placeholder">＃</span>`) : name
-				).replace(/\r\n/g, '\n');
+				).replaceAll('\r\n', '\n');
 				main[index] = row;
 			});
 		});
@@ -103,7 +103,7 @@ export const aligned = {
 				skipEmptyLines: true,
 				skipRecordsWithEmptyValues: true,
 				relaxColumnCount: true,
-				cast: (value) => value.replace(/\\n/g, '\n'),
+				cast: (value) => value.replaceAll('\n', '\n'),
 			}) as string[][]
 		)
 			.slice(1)
@@ -125,10 +125,15 @@ export const aligned = {
 		Object.keys(raw.jp.field)
 			.map((file) => {
 				const data = Object.keys(raw).reduce<Record<string, string[]>>((result, locale) => {
-					const messages = raw[locale].field[file]?.split(/(?<=\[(?:ENDN|TIME=-?\d+?)\])/);
+					const messages = raw[locale].field[file];
 
 					if (messages) {
-						result[locale] = messages.map((message) => message.replace(/\r\n/g, '\n'));
+						result[locale] = Object.entries(mogIconOpCode)
+							.reduce((result, [source, replacer]) => {
+								return result.replaceAll(source, replacer);
+							}, messages)
+							.split(/(?<=\[(?:ENDN|TIME=-?\d+?)\])/)
+							.map((message) => message.replaceAll('\r\n', '\n'));
 					}
 
 					return result;
@@ -185,7 +190,7 @@ export const aligned = {
 	title: {
 		warning: [
 			Object.keys(raw).reduce<Record<string, string>>((result, locale) => {
-				result[localeMap[locale]] = raw[locale].title.warning.trim().replace(/\r\n/g, '\n');
+				result[localeMap[locale]] = raw[locale].title.warning.trim().replaceAll('\r\n', '\n');
 				return result;
 			}, Object.create(null)),
 		],
