@@ -10,13 +10,15 @@ export class KoreanJosa extends LitElement {
 	}
 
 	@property()
-	moeum = '';
+	declare moeum;
 
 	@property()
-	batchim = '';
+	declare batchim;
 
 	constructor() {
 		super();
+		this.moeum = '';
+		this.batchim = '';
 		KoreanJosa.elementRegistry.add(this);
 	}
 

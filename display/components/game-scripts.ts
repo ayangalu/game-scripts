@@ -23,7 +23,7 @@ export interface GameInfo {
 export class GameScripts extends LitElement {
 	static styles = css`
 		:host {
-			--border-color: 1px solid rgb(var(--sl-color-gray-400));
+			--border-color: 1px solid #667585;
 
 			font-family: var(--sl-font-sans);
 			width: 100vw;
@@ -62,37 +62,47 @@ export class GameScripts extends LitElement {
 			padding: var(--sl-spacing-medium);
 			overflow: auto;
 		}
+
+		sl-menu {
+			min-height: 100%;
+			border: none;
+			border-radius: 0;
+		}
 	`;
 
 	@queryAll('sl-menu-item')
-	private menuItems?: NodeList<SlMenuItem>;
+	private declare menuItems?: NodeList<SlMenuItem>;
 
 	@query('message-table')
-	private messageTable?: MessageTable;
+	private declare messageTable?: MessageTable;
 
 	@state()
-	games: Record<string, GameInfo> = {};
+	declare games: Record<string, GameInfo>;
 
 	@state()
-	selectedGame?: GameInfo;
+	declare selectedGame?: GameInfo;
 
 	@state()
-	selectedMessages?: NRecord<string, string, 2>;
+	declare selectedMessages?: NRecord<string, string, 2>;
 
 	@state()
-	selectedLocales: string[] = [];
+	declare selectedLocales: string[];
 
 	@state()
-	selectedTargetLocale?: string;
+	declare selectedTargetLocale?: string;
 
 	@state()
-	searchResult?: Promise<SearchIndexLocation[]>;
+	declare searchResult?: Promise<SearchIndexLocation[]>;
 
 	@state()
-	searchIndex = 0;
+	declare searchIndex;
 
 	constructor() {
 		super();
+
+		this.games = {};
+		this.selectedLocales = [];
+		this.searchIndex = 0;
 
 		this.fetchJson<Record<string, GameInfo>>('games.json').then((data) => {
 			this.games = data;
@@ -268,7 +278,7 @@ export class GameScripts extends LitElement {
 				<div slot="suffix">
 					<sl-button
 						@click=${this.stepSearchResult(-1)}
-						type="default"
+						variant="default"
 						size="small"
 						.disabled=${until(this.searchResult?.then(({ length }) => !length) ?? true, true)}
 						circle
@@ -276,7 +286,7 @@ export class GameScripts extends LitElement {
 					></sl-button>
 					<sl-button
 						@click=${this.stepSearchResult(1)}
-						type="default"
+						variant="default"
 						size="small"
 						.disabled=${until(this.searchResult?.then(({ length }) => !length) ?? true, true)}
 						circle

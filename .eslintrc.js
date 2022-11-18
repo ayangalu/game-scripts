@@ -16,7 +16,16 @@ module.exports = {
 	},
 	plugins: ['style'],
 	rules: {
-		'style/group-imports': ['error'],
+		'style/group-imports': [
+			'error',
+			'@dotenv/config',
+			{ class: 'node' },
+			'modern-css-reset',
+			'@shoelace-style/shoelace/dist/themes',
+			'@shoelace-style/shoelace/dist/components',
+			{ class: 'external' },
+			{ class: 'relative' },
+		],
 		'style/sort-imports': ['error', { caseGroups: true, typesInGroup: 'top' }],
 	},
 	overrides: [

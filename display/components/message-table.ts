@@ -37,16 +37,21 @@ export class MessageTable extends LitElement {
 	`;
 
 	@property({ attribute: false })
-	gameInfo?: GameInfo;
+	declare gameInfo?: GameInfo;
 
 	@property({ attribute: false })
-	data?: NRecord<string, string, 2>;
+	declare data?: NRecord<string, string, 2>;
 
 	@property({ attribute: false })
-	locales: string[] = [];
+	declare locales: string[];
 
 	@property({ attribute: false })
-	targetLocale?: string;
+	declare targetLocale?: string;
+
+	constructor() {
+		super();
+		this.locales = [];
+	}
 
 	private toggleBlur({ currentTarget }: TargetEvent<HTMLElement>) {
 		currentTarget.classList.toggle('blurred');

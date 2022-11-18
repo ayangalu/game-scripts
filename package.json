@@ -11,13 +11,13 @@
 		"build": "vite build display"
 	},
 	"dependencies": {
+		"@shoelace-style/shoelace": "2.0.0-beta.83",
 		"cheerio": "1.0.0-rc.12",
 		"lit": "2.4.1",
-		"lodash": "4.17.21"
+		"modern-css-reset": "1.4.0"
 	},
 	"devDependencies": {
 		"@nishin/reader": "0.3.1",
-		"@shoelace-style/shoelace": "2.0.0-beta.83",
 		"@tswt/dedicated-worker": "0.0.1-alpha.10",
 		"@tswt/window": "0.0.1-alpha.10",
 		"@types/lodash": "4.14.189",
@@ -31,6 +31,7 @@
 		"fast-png": "6.1.0",
 		"html-entities": "2.3.3",
 		"html-validate": "7.9.0",
+		"lodash": "4.17.21",
 		"prettier": "2.7.1",
 		"tree-sitter": "0.20.1",
 		"tree-sitter-c-sharp": "0.20.0",

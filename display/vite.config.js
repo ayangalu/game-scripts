@@ -18,7 +18,7 @@ export default defineConfig({
 	},
 	server: {
 		fs: {
-			allow: ['components', 'worker'],
+			allow: ['..', 'components', 'worker'],
 		},
 	},
 	build: buildConfig,

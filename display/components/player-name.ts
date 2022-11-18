@@ -12,12 +12,13 @@ export class PlayerName extends LitElement {
 	}
 
 	@property()
-	character = '';
+	declare character;
 
 	private capitalize = false;
 
 	constructor() {
 		super();
+		this.character = '';
 		PlayerName.elementRegistry.add(this);
 
 		if (this.parentElement?.classList.contains('capitalize')) {
