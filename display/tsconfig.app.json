@@ -7,9 +7,11 @@
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"useDefineForClassFields": false,
-		"lib": ["es2020"],
-		"typeRoots": ["../node_modules/@tswt"],
-		"types": ["window"]
+		"lib": ["es2020", "dom", "dom.iterable"],
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["app/*"]
+		}
 	},
-	"include": ["components/**/*.ts", "../types.ts", "types.ts"]
+	"include": ["app/**/*.ts", "../types.d.ts", "types.d.ts"]
 }

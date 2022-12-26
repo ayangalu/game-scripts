@@ -1,8 +1,5 @@
 {
-	"name": "ss-text-dump",
-	"volta": {
-		"node": "16.13.0"
-	},
+	"name": "game-scripts",
 	"scripts": {
 		"dump": "ts-node -P tsconfig.tools.json --transpile-only tools/dump.ts",
 		"inspect": "ts-node -P tsconfig.tools.json --transpile-only tools/inspect.ts",
@@ -11,10 +8,12 @@
 		"build": "vite build display"
 	},
 	"dependencies": {
-		"@shoelace-style/shoelace": "2.0.0-beta.83",
+		"@shoelace-style/shoelace": "2.0.0-beta.86",
 		"cheerio": "1.0.0-rc.12",
-		"lit": "2.4.1",
-		"modern-css-reset": "1.4.0"
+		"lit": "2.5.0",
+		"modern-css-reset": "1.4.0",
+		"rxjs": "7.6.0",
+		"zod": "3.20.2"
 	},
 	"devDependencies": {
 		"@nishin/reader": "0.3.1",

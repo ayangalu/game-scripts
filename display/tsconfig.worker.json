@@ -9,5 +9,5 @@
 		"typeRoots": ["../node_modules/@tswt"],
 		"types": ["dedicated-worker"]
 	},
-	"include": ["worker/**/*.ts", "../types.ts", "types.ts"]
+	"include": ["worker/**/*.ts", "../types.d.ts", "types.d.ts"]
 }

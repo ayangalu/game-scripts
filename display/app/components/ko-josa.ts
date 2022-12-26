@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 @customElement('ko-josa')
@@ -27,6 +27,10 @@ export class KoreanJosa extends LitElement {
 		KoreanJosa.elementRegistry.delete(this);
 	}
 
+	createRenderRoot() {
+		return this;
+	}
+
 	render() {
 		const previous: (Node & { shadowRoot?: ShadowRoot }) | null = this.previousSibling;
 		const text = previous?.shadowRoot?.textContent ?? previous?.textContent ?? '';
@@ -46,6 +50,6 @@ export class KoreanJosa extends LitElement {
 			}
 		}
 
-		return html`${variant}`;
+		return variant;
 	}
 }

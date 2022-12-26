@@ -24,6 +24,7 @@ module.exports = {
 			'@shoelace-style/shoelace/dist/themes',
 			'@shoelace-style/shoelace/dist/components',
 			{ class: 'external' },
+			'~',
 			{ class: 'relative' },
 		],
 		'style/sort-imports': ['error', { caseGroups: true, typesInGroup: 'top' }],
@@ -52,6 +53,12 @@ module.exports = {
 			plugins: ['@typescript-eslint'],
 			rules: {
 				'@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+			},
+		},
+		{
+			files: '*.d.ts',
+			rules: {
+				'@typescript-eslint/consistent-type-imports': 'off',
 			},
 		},
 	],
