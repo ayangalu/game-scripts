@@ -1,7 +1,7 @@
 {
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"html.customData": ["./node_modules/@shoelace-style/shoelace/dist/vscode.html-custom-data.json"],
-	"[json][javascript][typescript]": {
+	"[json][javascript][typescript][css]": {
 	"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
