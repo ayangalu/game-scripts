@@ -167,15 +167,13 @@ function mapEntries<T, U>(source: Record<string, T>, callback: (value: T, key: s
 }
 
 const messages = {
-	system: {
-		system: mapEntries(aligned.system.system, (entries, name) => {
-			console.log(`manifest/text/localization.txt/${name}`);
-			return mapEntries(entries, (message, locale) => {
-				return transform(message, locale);
-			});
-		}),
-	},
-	field: mapEntries(aligned.field, (entries, file) => {
+	'localization.txt': mapEntries(aligned.system.system, (entries, name) => {
+		console.log(`manifest/text/localization.txt/${name}`);
+		return mapEntries(entries, (message, locale) => {
+			return transform(message, locale);
+		});
+	}),
+	'field': mapEntries(aligned.field, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`field/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -183,7 +181,7 @@ const messages = {
 			});
 		});
 	}),
-	item: mapEntries(aligned.item, (entries, file) => {
+	'item': mapEntries(aligned.item, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`item/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -191,7 +189,7 @@ const messages = {
 			});
 		});
 	}),
-	keyitem: mapEntries(aligned.keyitem, (entries, file) => {
+	'keyitem': mapEntries(aligned.keyitem, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`keyitem/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -199,7 +197,7 @@ const messages = {
 			});
 		});
 	}),
-	ability: mapEntries(aligned.ability, (entries, file) => {
+	'ability': mapEntries(aligned.ability, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`ability/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -207,7 +205,7 @@ const messages = {
 			});
 		});
 	}),
-	command: mapEntries(aligned.command, (entries, file) => {
+	'command': mapEntries(aligned.command, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`command/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -215,7 +213,7 @@ const messages = {
 			});
 		});
 	}),
-	battle: mapEntries(aligned.battle, (entries, file) => {
+	'battle': mapEntries(aligned.battle, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`battle/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -223,7 +221,7 @@ const messages = {
 			});
 		});
 	}),
-	location: {
+	'location': {
 		'loc_name.mes': mapEntries(aligned.location['loc_name.mes'], (entries, index) => {
 			console.log(`location/log_name.mes #${index}`);
 			return mapEntries(entries, (message, locale) => {
@@ -231,7 +229,7 @@ const messages = {
 			});
 		}),
 	},
-	etc: mapEntries(aligned.etc, (entries, file) => {
+	'etc': mapEntries(aligned.etc, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`etc/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {
@@ -239,7 +237,7 @@ const messages = {
 			});
 		});
 	}),
-	title: mapEntries(aligned.title, (entries, file) => {
+	'title': mapEntries(aligned.title, (entries, file) => {
 		return entries.map((entry, index) => {
 			console.log(`title/${file} #${index}`);
 			return mapEntries(entry, (message, locale) => {

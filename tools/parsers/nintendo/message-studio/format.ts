@@ -2,8 +2,6 @@ import type { BinaryReader, Encoding, SafeIntBytes } from '@nishin/reader';
 import { DataType } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
-import type { Mutable } from '../../../../types';
-
 export const enum ShiftCode {
 	Out = 0xe,
 	In = 0xf,

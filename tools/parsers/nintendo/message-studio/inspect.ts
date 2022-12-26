@@ -1,6 +1,5 @@
 import { readdirSync } from 'node:fs';
 
-import type { NRecord } from '../../../../types';
 import { U8 } from '../u8';
 import { MSBT } from './msbt';
 

@@ -3,7 +3,6 @@ import path from 'node:path';
 
 import { merge, mergeWith } from 'lodash';
 
-import type { NRecord } from '../../../types';
 import { HtmlTools } from '../../html-tools';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { U8 } from '../../parsers/nintendo/u8';

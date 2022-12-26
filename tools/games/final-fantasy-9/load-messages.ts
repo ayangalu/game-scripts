@@ -3,7 +3,6 @@ import path from 'node:path';
 
 import { parse as csvParse } from 'csv-parse/sync';
 
-import type { NRecord } from '../../../types';
 import type { Alignment } from './alignments';
 import { SerializedFile } from '../../parsers/unity/serialized-file';
 import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
@@ -83,7 +82,7 @@ const simpleSplit = (source: string) =>
 			raw[locale][source][file].split(/(?<=\[ENDN\])/).forEach((name, index) => {
 				const row = main[index] ?? {};
 				row[localeMap[locale]] = (
-					file === 'follow.mes' && index >= 8 ? name.slice(1).replace(/%|&/, `<span class="placeholder">＃</span>`) : name
+					file === 'follow.mes' && index >= 8 ? name.slice(1).replace(/%|&/, `[CARD]`) : name
 				).replaceAll('\r\n', '\n');
 				main[index] = row;
 			});
@@ -103,7 +102,7 @@ export const aligned = {
 				skipEmptyLines: true,
 				skipRecordsWithEmptyValues: true,
 				relaxColumnCount: true,
-				cast: (value) => value.replaceAll('\n', '\n'),
+				cast: (value) => value.replaceAll('\\n', '\n'),
 			}) as string[][]
 		)
 			.slice(1)

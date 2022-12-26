@@ -1,6 +1,5 @@
 import { readdirSync } from 'node:fs';
 
-import type { NRecord } from '../../../types';
 import type { ShiftControl } from '../../parsers/nintendo/message-studio/format';
 import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect';
 import { MSBP } from '../../parsers/nintendo/message-studio/msbp';
