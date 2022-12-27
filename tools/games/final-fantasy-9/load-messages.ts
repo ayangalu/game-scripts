@@ -74,8 +74,10 @@ const align = (source: Record<string, string[]>, data: Alignment): Array<Record<
 	return rows.filter((row) => Object.values(row).some((message) => message.trim()));
 };
 
+type SimpleSplitResult = Record<string, Array<Record<string, string>>>;
+
 const simpleSplit = (source: string) =>
-	Object.keys(raw.jp[source]).reduce<Record<string, Array<Record<string, string>>>>((result, file) => {
+	Object.keys(raw.jp[source]).reduce<SimpleSplitResult>((result, file) => {
 		const main = result[file] ?? [];
 
 		Object.keys(raw).forEach((locale) => {
@@ -102,7 +104,7 @@ export const aligned = {
 				skipEmptyLines: true,
 				skipRecordsWithEmptyValues: true,
 				relaxColumnCount: true,
-				cast: (value) => value.replaceAll('\\n', '\n'),
+				cast: (value) => value.replaceAll('\\n', '\n').replaceAll('{0}', '[CARD]'),
 			}) as string[][]
 		)
 			.slice(1)
