@@ -26,7 +26,7 @@ import './components/player-name';
 import './layout/app';
 import './main.css';
 
-setBasePath('/shoelace');
+setBasePath('shoelace');
 
 declare module '@shoelace-style/shoelace' {
 	interface SlSelectSingle<T extends string = string> extends SlSelect {
