@@ -46,5 +46,3 @@ const [tags, qualifiers] = Object.entries(aligned).reduce<[Record<string, any>, 
 	},
 	[Object.create(null), Object.create(null)],
 );
-
-void 0;

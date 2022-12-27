@@ -6,7 +6,7 @@ import { parse as csvParse } from 'csv-parse/sync';
 import type { Alignment } from './alignments';
 import { SerializedFile } from '../../parsers/unity/serialized-file';
 import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
-import { eventMessageMap, mogIconOpCode } from './assembly-data';
+import { eventMessageMap, messageDB, mogIconOpCode, sceneData } from './assembly-data';
 
 const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;
 const textRoot = path.join(assetsRoot, 'text');
@@ -96,6 +96,7 @@ const simpleSplit = (source: string) =>
 	}, Object.create(null));
 
 const fieldOrder = [1, ...new Set(Object.values(eventMessageMap))];
+const battleOrder = [...new Set(Object.values(sceneData))];
 
 export const aligned = {
 	system: {
@@ -149,7 +150,8 @@ export const aligned = {
 			.sort(([a], [b]) => {
 				const lookup = (value: string) => (id: number) => new RegExp(`^${id}m?\\.mes$`).test(value);
 				return fieldOrder.findIndex(lookup(a)) - fieldOrder.findIndex(lookup(b));
-			}),
+			})
+			.map(([file, data]) => [`${file} (${messageDB[parseInt(file)]})`, data]),
 	),
 	item: simpleSplit('item'),
 	keyitem: simpleSplit('keyitem'),
@@ -170,7 +172,16 @@ export const aligned = {
 
 				return [file, align(data, { max: data.jp.length })] as const;
 			})
-			.sort(([a], [b]) => a.localeCompare(b, 'en-US', { numeric: true })),
+			.sort(([a], [b]) => {
+				const idA = parseInt(a);
+				const idB = parseInt(b);
+				return battleOrder.findIndex((value) => value === idA) - battleOrder.findIndex((value) => value === idB);
+			})
+			.map(([file, data]) => {
+				const nameEN = data[0]['en-US'].replaceAll(/\[.+?\]/gu, '');
+				const name = nameEN === '„♂' ? 'ヴァイス' : nameEN || 'Steiner';
+				return [`${file} (${name})`, data];
+			}),
 	),
 	location: {
 		'loc_name.mes': Object.keys(raw).reduce<NRecord<string, string, 2>>((result, locale) => {

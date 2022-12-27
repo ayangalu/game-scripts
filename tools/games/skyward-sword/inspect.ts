@@ -35,5 +35,3 @@ const result = controlCodes(msbts, {
 		4, // plural form from word.msbt
 	],
 });
-
-void 0;

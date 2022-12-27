@@ -57,5 +57,3 @@ const inconsistent = Object.entries(msbt).reduce<NRecord<string, Array<string | 
 	},
 	{},
 );
-
-void 0;
