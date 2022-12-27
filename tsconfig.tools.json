@@ -5,8 +5,8 @@
 		"moduleResolution": "node",
 		"target": "es2020",
 		"module": "commonjs",
-		"lib": ["es2020"],
+		"lib": ["es2021"],
 		"types": ["node", "lodash"]
 	},
-	"include": ["tools/**/*.ts", "types.ts"]
+	"include": ["tools/**/*.ts", "types.d.ts"]
 }

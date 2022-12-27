@@ -1,16 +1,17 @@
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
+import { DataType } from '@nishin/reader';
+
 import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format';
 import { ensure } from '../../ensure';
-import { DataType } from '../../parsers/binary';
 import {
 	capitalizationFormatter,
 	colorFormatter,
 	hex,
 	rubyFormatter,
-	ShiftCode,
 	variableFormatter,
+	ShiftCode,
 } from '../../parsers/nintendo/message-studio/format';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
 import { U8 } from '../../parsers/nintendo/u8';
@@ -293,7 +294,7 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 				0x0000: {
 					0x0000: rubyFormatter(),
 					0x0003: colorFormatter<number>({
-						lookup: (parameters) => parameters.next(DataType.UInt16),
+						lookup: (parameters) => parameters.next(DataType.Uint16).value,
 						reset: [0xffff],
 						colors: {
 							0x0000: 'emphasis',

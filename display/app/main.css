@@ -1,0 +1,206 @@
+.sl-theme-dark {
+	/* https://html-color.codes/color-names/slategrey */
+	--slategrey-lighter-15: #f1f2f4;
+	--slategrey-lighter-14: #e8ebed;
+	--slategrey-lighter-13: #dfe3e7;
+	--slategrey-lighter-12: #d7dbe0;
+	--slategrey-lighter-11: #ced4d9;
+	--slategrey-lighter-10: #c5ccd3;
+	--slategrey-lighter-9: #bdc4cc;
+	--slategrey-lighter-8: #b4bdc5;
+	--slategrey-lighter-7: #abb5bf;
+	--slategrey-lighter-6: #a3adb8;
+	--slategrey-lighter-5: #9aa6b1;
+	--slategrey-lighter-4: #929eab;
+	--slategrey-lighter-3: #8996a4;
+	--slategrey-lighter-2: #808f9d;
+	--slategrey-lighter-1: #788797;
+	--slategrey-darker-1: #6a7a8a;
+	--slategrey-darker-2: #667585;
+	--slategrey-darker-3: #62707f;
+	--slategrey-darker-4: #5d6b79;
+	--slategrey-darker-5: #596673;
+	--slategrey-darker-6: #54616d;
+	--slategrey-darker-7: #505c68;
+	--slategrey-darker-8: #4b5762;
+	--slategrey-darker-9: #47525c;
+	--slategrey-darker-10: #434d56;
+	--slategrey-darker-11: #3e4751;
+	--slategrey-darker-12: #3a424b;
+	--slategrey-darker-13: #353d45;
+	--slategrey-darker-14: #31383f;
+	--slategrey-darker-15: #2c333a;
+
+	background: var(--slategrey-darker-13);
+	font-family: var(--sl-font-sans);
+
+	--gs-border: 1px solid var(--slategrey-darker-2);
+
+	--sl-color-primary-50: var(--sl-color-teal-50);
+	--sl-color-primary-100: var(--sl-color-teal-100);
+	--sl-color-primary-200: var(--sl-color-teal-200);
+	--sl-color-primary-300: var(--sl-color-teal-300);
+	--sl-color-primary-400: var(--sl-color-teal-400);
+	--sl-color-primary-500: var(--sl-color-teal-500);
+	--sl-color-primary-600: var(--sl-color-teal-600);
+	--sl-color-primary-700: var(--sl-color-teal-700);
+	--sl-color-primary-800: var(--sl-color-teal-800);
+	--sl-color-primary-900: var(--sl-color-teal-900);
+	--sl-color-primary-950: var(--sl-color-teal-950);
+
+	--sl-color-neutral-0: var(--sl-color-gray-50);
+	--sl-color-neutral-50: var(--sl-color-gray-100);
+	--sl-color-neutral-100: var(--sl-color-gray-200);
+	--sl-color-neutral-200: var(--sl-color-gray-300);
+	--sl-color-neutral-300: var(--sl-color-gray-400);
+	--sl-color-neutral-400: var(--sl-color-gray-500);
+	--sl-color-neutral-500: var(--sl-color-gray-600);
+	--sl-color-neutral-600: var(--sl-color-gray-700);
+	--sl-color-neutral-700: var(--sl-color-gray-800);
+	--sl-color-neutral-800: var(--sl-color-gray-900);
+	--sl-color-neutral-900: var(--sl-color-gray-950);
+	--sl-color-neutral-950: var(--sl-color-neutral-1000);
+
+	/* --sl-color-neutral-0: var(--sl-color-gray-100);
+	--sl-color-neutral-50: var(--sl-color-gray-200);
+	--sl-color-neutral-100: var(--sl-color-gray-300);
+	--sl-color-neutral-200: var(--sl-color-gray-400);
+	--sl-color-neutral-300: var(--sl-color-gray-500);
+	--sl-color-neutral-400: var(--sl-color-gray-600);
+	--sl-color-neutral-500: var(--sl-color-gray-700);
+	--sl-color-neutral-600: var(--sl-color-gray-800);
+	--sl-color-neutral-700: var(--sl-color-gray-900);
+	--sl-color-neutral-800: var(--sl-color-gray-950);
+	--sl-color-neutral-900: var(--sl-color-gray-1000);
+	--sl-color-neutral-950: var(--sl-color-neutral-1000); */
+
+	--sl-input-background-color: var(--slategrey-darker-9);
+	--sl-input-background-color-disabled: var(--slategrey-darker-11);
+
+	--sl-input-border-color: var(--slategrey-lighter-4);
+	--sl-input-border-color-disabled: var(--slategrey-lighter-4);
+	--sl-input-border-color-hover: var(--slategrey-lighter-5);
+
+	--sl-panel-background-color: var(--slategrey-darker-6);
+	--sl-panel-border-color: var(--slategrey-darker-2);
+}
+
+gs-app {
+	width: 100vw;
+	height: 100vh;
+	display: grid;
+	grid:
+		'sidebar header' auto
+		'sidebar content' 1fr
+		/ minmax(250px, auto) 1fr;
+}
+
+gs-app.ruby-hide rt {
+	display: none;
+}
+
+gs-app.ruby-toggle td:not(.dim) rt {
+	cursor: pointer;
+}
+
+gs-app.ruby-toggle td:not(.dim) rt:not(.show) {
+	filter: blur(5px);
+}
+
+gs-app > header {
+	grid-area: header;
+	padding: var(--sl-spacing-medium);
+	border-bottom: var(--gs-border);
+	display: flex;
+	flex-direction: column;
+	gap: var(--sl-spacing-small);
+}
+
+gs-app > header > .focus-search-container {
+	display: flex;
+	gap: var(--sl-spacing-x-small);
+}
+
+gs-app > aside {
+	grid-area: sidebar;
+	overflow-y: scroll;
+	border-right: var(--gs-border);
+}
+
+gs-app > main {
+	grid-area: content;
+	overflow: auto;
+}
+
+gs-app > main.no-data {
+	padding: var(--sl-spacing-medium);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+gs-app > main.no-data > sl-alert::part(base) {
+	width: fit-content;
+}
+
+gs-message-table {
+	display: block;
+}
+
+table {
+	min-width: 100%;
+	border-collapse: collapse;
+	border-bottom: var(--gs-border);
+}
+
+table.no-bottom {
+	border-bottom: none;
+}
+
+tr:not(:last-of-type) td {
+	border-bottom: var(--gs-border);
+}
+
+td:not(:last-of-type) {
+	border-right: var(--gs-border);
+}
+
+td {
+	padding: var(--sl-spacing-small);
+}
+
+td[lang] {
+	text-shadow: 1px 1px 2px hsl(0 0% 0%);
+}
+
+pre {
+	margin: 0;
+	font-family: inherit;
+}
+
+pre ruby {
+	white-space: normal;
+}
+
+td hr {
+	border: none;
+	border-top: 1px dashed var(--slategrey-darker-8);
+}
+
+td ul {
+	white-space: initial;
+	/* looks weird in Chromium without */
+	display: flex;
+	flex-direction: column;
+}
+
+td.focus {
+	font-size: var(--sl-font-size-x-large);
+}
+
+td.dim > pre {
+	cursor: pointer;
+}
+
+td.dim > pre.blur {
+	filter: blur(5px);
+}

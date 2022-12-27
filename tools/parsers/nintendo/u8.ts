@@ -1,4 +1,6 @@
-import { BinaryReader, ByteOrder, DataType } from '../binary';
+import { readFileSync } from 'node:fs';
+
+import { BinaryReader, ByteOrder, DataType, Encoding } from '@nishin/reader';
 
 interface Directory {
 	readonly name: string;
@@ -52,15 +54,17 @@ export class U8 {
 	readonly files: readonly U8DataFile[];
 
 	constructor(source: string | Buffer) {
-		const reader = new BinaryReader(source)
-			.checkMagic(Buffer.from([0x55, 0xaa, 0x38, 0x2d]))
-			.setByteOrder(ByteOrder.BigEndian);
+		const data = typeof source === 'string' ? readFileSync(source) : source;
 
-		const startOffset = reader.next(DataType.UInt32);
+		const reader = new BinaryReader(data, ByteOrder.BigEndian);
+
+		reader.assertMagic(Buffer.from([0x55, 0xaa, 0x38, 0x2d]));
+
+		const startOffset = reader.next(DataType.Uint32).value;
 
 		reader.seek(startOffset + 8);
 
-		const nodeCount = reader.next(DataType.UInt32);
+		const nodeCount = reader.next(DataType.Uint32).value;
 
 		const nodeSize = 12;
 		const directoryStack: Directory[] = [];
@@ -70,13 +74,16 @@ export class U8 {
 
 			reader.seek(startOffset + index * nodeSize);
 
-			const isDirectory = reader.next(DataType.UInt8);
-			const nameOffset = reader.next(DataType.UInt24);
-			const info = reader.next(DataType.UInt32, DataType.UInt32);
+			const isDirectory = reader.next(DataType.Boolean).value;
+
+			reader.skip(1);
+
+			const nameOffset = reader.next(DataType.Uint16).value;
+			const info = reader.next(DataType.array(DataType.Uint32, 2)).value;
 
 			reader.seek(startOffset + nodeCount * nodeSize + nameOffset);
 
-			const name = reader.next(DataType.StringASCII);
+			const name = reader.next(DataType.string(Encoding.ASCII)).value;
 
 			const shiftIndex = directoryStack[0]?.shiftIndex ?? nodeCount;
 

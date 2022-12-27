@@ -1,15 +1,16 @@
 import type { CheerioAPI } from 'cheerio';
-import cheerio from 'cheerio';
-
-import type { NRecord, SearchIndexLocation } from '../types';
+import { load } from 'cheerio';
 
 let index: Array<[string, SearchIndexLocation[]]>;
-let data: NRecord<string, string, 4>;
+let messageFormat: MessageFormat;
+let messageData: MessageData;
 
 self.onmessage = (event) => {
 	if (typeof event.data === 'object') {
 		// @ts-expect-error
-		data = event.data;
+		messageFormat = event.data.format;
+		// @ts-expect-error
+		messageData = event.data.data;
 		buildIndex();
 	}
 
@@ -29,6 +30,8 @@ function search(value: string) {
 }
 
 function buildIndex() {
+	const locationMap: Record<string, SearchIndexLocation[]> = {};
+
 	const rubyBase = ($: CheerioAPI) => {
 		$('hr').replaceWith(' ');
 		$('rt').remove();
@@ -41,16 +44,21 @@ function buildIndex() {
 		return normalize($.text());
 	};
 
-	const locationMap: Record<string, SearchIndexLocation[]> = {};
+	const walk = (format: MessageFormat, data: MessageData, path: string[]) => {
+		const visited = new Set<string>();
 
-	Object.entries(data).forEach(([group, files]) => {
-		Object.entries(files).forEach(([file, locales]) => {
-			Object.entries(locales).forEach(([label, messages]) => {
-				Object.entries(messages).forEach(([locale, message]) => {
-					const location = { group, file, label, locale, message };
+		const processMessages = (name: string, subTree: MessageData[string]) => {
+			for (const [key, message] of Object.entries(subTree as MessageDict | MessageList)) {
+				for (const [locale, value] of Object.entries(message)) {
+					const location = {
+						path: [...path, name],
+						key,
+						locale,
+						message: value,
+					};
 
-					const rb = rubyBase(cheerio.load(message));
-					const rt = rubyText(cheerio.load(message));
+					const rb = rubyBase(load(value));
+					const rt = rubyText(load(value));
 
 					if (rb) {
 						const locations = locationMap[rb];
@@ -69,10 +77,41 @@ function buildIndex() {
 							locationMap[rt] = [location];
 						}
 					}
+				}
+			}
+		};
+
+		for (const [entry, definition] of Object.entries(format)) {
+			const processSubTrees: SubTreeProcessor<void> = ({ forWildcard, forEntry }) => {
+				if (entry === '*') {
+					for (const [name, subTree] of Object.entries(data)) {
+						if (visited.has(name)) {
+							continue;
+						}
+
+						forWildcard(name, subTree);
+					}
+				} else {
+					visited.add(entry);
+					forEntry();
+				}
+			};
+
+			if (definition) {
+				processSubTrees({
+					forWildcard: (name, subTree) => walk(definition, subTree as MessageData, [...path, name]),
+					forEntry: () => walk(definition, data[entry] as MessageData, [...path, entry]),
 				});
-			});
-		});
-	});
+			} else {
+				processSubTrees({
+					forWildcard: processMessages,
+					forEntry: () => processMessages(entry, data[entry]),
+				});
+			}
+		}
+	};
+
+	walk(messageFormat, messageData, []);
 
 	index = Object.entries(locationMap);
 

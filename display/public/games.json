@@ -1,47 +1,151 @@
 {
-	"Skyward Sword": {
-		"root": "skyward-sword",
-		"locales": ["de-DE", "en-GB", "ja-JP"],
-		"characters": { "tloz:link": "Link" }
+	"Wii": {
+		"Skyward Sword": {
+			"root": "skyward-sword",
+			"messageFormat": {
+				"*": {
+					"*": null
+				}
+			},
+			"locales": ["de-DE", "en-GB", "ja-JP"],
+			"ruby": ["ja-JP"],
+			"characters": {
+				"tloz:link": {
+					"ja-JP": "リンク",
+					"*": "Link"
+				}
+			}
+		}
 	},
-	"Skyward Sword HD": {
-		"root": "skyward-sword-hd",
-		"locales": [
-			"de-DE",
-			"en-GB",
-			"en-US",
-			"es-ES",
-			"es-US",
-			"fr-FR",
-			"fr-US",
-			"it-IT",
-			"ja-JP",
-			"ko-KR",
-			"nl-NL",
-			"ru-RU",
-			"zh-CN",
-			"zh-TW"
-		],
-		"characters": { "tloz:link": "Link" }
+	"Switch": {
+		"Skyward Sword HD": {
+			"root": "skyward-sword-hd",
+			"messageFormat": {
+				"*": {
+					"*": null
+				}
+			},
+			"locales": [
+				"de-DE",
+				"en-GB",
+				"en-US",
+				"es-ES",
+				"es-US",
+				"fr-FR",
+				"fr-US",
+				"it-IT",
+				"ja-JP",
+				"ko-KR",
+				"nl-NL",
+				"ru-RU",
+				"zh-CN",
+				"zh-TW"
+			],
+			"ruby": ["ja-JP"],
+			"characters": {
+				"tloz:link": {
+					"ja-JP": "リンク",
+					"ko-KR": "링크",
+					"ru-RU": "Линк",
+					"zh-CN": "林克",
+					"zh-TW": "林克",
+					"*": "Link"
+				}
+			}
+		},
+		"Link's Awakening": {
+			"root": "links-awakening",
+			"messageFormat": {
+				"*": null
+			},
+			"locales": [
+				"de-DE",
+				"en-GB",
+				"en-US",
+				"es-ES",
+				"es-US",
+				"fr-FR",
+				"fr-US",
+				"it-IT",
+				"ja-JP",
+				"ko-KR",
+				"nl-NL",
+				"ru-RU",
+				"zh-CN",
+				"zh-TW"
+			],
+			"ruby": ["ja-JP"],
+			"characters": {
+				"tloz:link": {
+					"ja-JP": "リンク",
+					"ko-KR": "링크",
+					"ru-RU": "Линк",
+					"zh-CN": "林克",
+					"zh-TW": "林克",
+					"*": "Link"
+				}
+			}
+		}
 	},
-	"Link's Awakening": {
-		"root": "links-awakening",
-		"locales": [
-			"de-DE",
-			"en-GB",
-			"en-US",
-			"es-ES",
-			"es-US",
-			"fr-FR",
-			"fr-US",
-			"it-IT",
-			"ja-JP",
-			"ko-KR",
-			"nl-NL",
-			"ru-RU",
-			"zh-CN",
-			"zh-TW"
-		],
-		"characters": { "tloz:link": "Link" }
+	"PC": {
+		"Final Fantasy IX": {
+			"root": "final-fantasy-9",
+			"messageFormat": {
+				"localization.txt": null,
+				"*": {
+					"*": null
+				}
+			},
+			"locales": ["de-DE", "en-GB", "en-US", "es-ES", "fr-FR", "it-IT", "ja-JP"],
+			"characters": {
+				"ff9:zidane": {
+					"es-ES": "Yitán",
+					"fr-FR": "Djidane",
+					"it-IT": "Gidan",
+					"ja-JP": "ジタン",
+					"*": "Zidane"
+				},
+				"ff9:vivi": {
+					"fr-FR": "Bibi",
+					"ja-JP": "ビビ",
+					"*": "Vivi"
+				},
+				"ff9:dagger": {
+					"es-ES": "Daga",
+					"fr-FR": "Dagga",
+					"de-DE": "Lili",
+					"it-IT": "Daga",
+					"ja-JP": "ダガー",
+					"*": "Dagger"
+				},
+				"ff9:steiner": {
+					"ja-JP": "スタイナー",
+					"*": "Steiner"
+				},
+				"ff9:freya": {
+					"es-ES": "Freija",
+					"fr-FR": "Freyja",
+					"de-DE": "Freija",
+					"it-IT": "Flyer",
+					"ja-JP": "フライヤ",
+					"*": "Freya"
+				},
+				"ff9:quina": {
+					"fr-FR": "Kweena",
+					"ja-JP": "クイナ",
+					"*": "Quina"
+				},
+				"ff9:eiko": {
+					"ja-JP": "エーコ",
+					"*": "Eiko"
+				},
+				"ff9:amarant": {
+					"fr-FR": "Tarask",
+					"de-DE": "Mahagon",
+					"ja-JP": "サラマンダー",
+					"*": "Amarant"
+				}
+			}
+		}
 	}
 }

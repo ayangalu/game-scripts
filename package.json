@@ -1,8 +1,5 @@
 {
-	"name": "ss-text-dump",
-	"volta": {
-		"node": "16.8.0"
-	},
+	"name": "game-scripts",
 	"scripts": {
 		"dump": "ts-node -P tsconfig.tools.json --transpile-only tools/dump.ts",
 		"inspect": "ts-node -P tsconfig.tools.json --transpile-only tools/inspect.ts",
@@ -11,22 +8,34 @@
 		"build": "vite build display"
 	},
 	"dependencies": {
-		"cheerio": "1.0.0-rc.10",
-		"lit": "2.0.0-rc.3",
-		"lodash": "4.17.21"
+		"@shoelace-style/shoelace": "2.0.0-beta.86",
+		"cheerio": "1.0.0-rc.12",
+		"lit": "2.5.0",
+		"modern-css-reset": "1.4.0",
+		"rxjs": "7.6.0",
+		"zod": "3.20.2"
 	},
 	"devDependencies": {
-		"@shoelace-style/shoelace": "2.0.0-beta.50",
+		"@nishin/reader": "0.3.1",
 		"@tswt/dedicated-worker": "0.0.1-alpha.10",
 		"@tswt/window": "0.0.1-alpha.10",
-		"@types/lodash": "4.14.172",
-		"@types/node": "16.7.10",
-		"fast-png": "5.0.4",
-		"html-entities": "2.3.2",
-		"html-validate": "5.4.1",
-		"prettier": "2.3.2",
-		"ts-node": "10.2.1",
-		"typescript": "4.3.5",
-		"vite": "2.5.3"
+		"@types/lodash": "4.14.189",
+		"@types/node": "18.11.9",
+		"@typescript-eslint/eslint-plugin": "5.43.0",
+		"@typescript-eslint/parser": "5.43.0",
+		"csv": "6.2.2",
+		"csv-parse": "5.3.2",
+		"eslint": "8.27.0",
+		"eslint-plugin-style": "0.2.0",
+		"fast-png": "6.1.0",
+		"html-entities": "2.3.3",
+		"html-validate": "7.9.0",
+		"lodash": "4.17.21",
+		"prettier": "2.7.1",
+		"tree-sitter": "0.20.1",
+		"tree-sitter-c-sharp": "0.20.0",
+		"ts-node": "10.9.1",
+		"typescript": "4.8.4",
+		"vite": "3.2.4"
 	}
 }

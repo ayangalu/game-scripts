@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { defineConfig } from 'vite';
 
@@ -18,7 +19,12 @@ export default defineConfig({
 	},
 	server: {
 		fs: {
-			allow: ['components', 'worker'],
+			allow: ['..', 'app', 'worker'],
+		},
+	},
+	resolve: {
+		alias: {
+			'~': path.resolve(__dirname, 'app'),
 		},
 	},
 	build: buildConfig,
