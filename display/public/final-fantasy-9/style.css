@@ -35,10 +35,11 @@
 .keyboard {
 	display: inline-block;
 	vertical-align: text-bottom;
-	height: var(--inline-height, 1em);
-	width: calc(var(--width) / var(--height) * var(--inline-height, 1em));
+	height: calc(var(--height) / 64 * var(--inline-height, 1em));
+	width: calc(var(--width) * var(--inline-height, 1em) / 64);
 	background-size: cover;
 	filter: drop-shadow(0.02em 0.02em 0.04em hsl(0 0% 0%));
+	vertical-align: middle;
 }
 
 .icon.ability-stone {
@@ -429,8 +430,9 @@
 	--width: 55;
 	--height: 55;
 	background-image: url('icon/keyboard_button.png');
-	font-size: 0.75em;
-	text-align: center;
+	font-size: 0.5em;
+	display: inline-grid;
+	place-content: center;
 }
 
 .keyboard.d-pad.down,
