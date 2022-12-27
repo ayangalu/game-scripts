@@ -1,5 +1,5 @@
 interface MessageFormat {
-	readonly [key: string]: 'dict' | 'list' | MessageFormat;
+	readonly [key: string]: null | MessageFormat;
 }
 
 type Message = Readonly<Record<string, string>>;
@@ -17,7 +17,7 @@ type SubTreeProcessor<T> = (templates: {
 
 interface SearchIndexLocation {
 	readonly path: readonly string[];
-	readonly key: number;
+	readonly key: string;
 	readonly locale: string;
 	readonly message: string;
 }

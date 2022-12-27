@@ -48,7 +48,7 @@ function buildIndex() {
 		const visited = new Set<string>();
 
 		const processMessages = (name: string, subTree: MessageData[string]) => {
-			for (const [key, message] of Object.values(subTree as MessageDict | MessageList).entries()) {
+			for (const [key, message] of Object.entries(subTree as MessageDict | MessageList)) {
 				for (const [locale, value] of Object.entries(message)) {
 					const location = {
 						path: [...path, name],
@@ -97,15 +97,15 @@ function buildIndex() {
 				}
 			};
 
-			if (typeof definition === 'string') {
-				processSubTrees({
-					forWildcard: processMessages,
-					forEntry: () => processMessages(entry, data[entry]),
-				});
-			} else {
+			if (definition) {
 				processSubTrees({
 					forWildcard: (name, subTree) => walk(definition, subTree as MessageData, [...path, name]),
 					forEntry: () => walk(definition, data[entry] as MessageData, [...path, entry]),
+				});
+			} else {
+				processSubTrees({
+					forWildcard: processMessages,
+					forEntry: () => processMessages(entry, data[entry]),
 				});
 			}
 		}

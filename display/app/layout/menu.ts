@@ -81,15 +81,15 @@ export class Menu extends LitElement {
 				}
 			};
 
-			if (typeof definition === 'string') {
-				process({
-					forWildcard: (name) => [name, 'file-earmark'],
-					forEntry: () => [entry, 'file-earmark'],
-				});
-			} else {
+			if (definition) {
 				process({
 					forWildcard: (name, subTree) => [name, 'folder', this.parseTree(definition, subTree as MessageData)],
 					forEntry: () => [entry, 'folder', this.parseTree(definition, data[entry] as MessageData)],
+				});
+			} else {
+				process({
+					forWildcard: (name) => [name, 'file-earmark'],
+					forEntry: () => [entry, 'file-earmark'],
 				});
 			}
 		}

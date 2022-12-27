@@ -23,6 +23,8 @@ export class SearchBar extends LitElement {
 		}
 	`;
 
+	private debounceTimer = 0;
+
 	@subscribe(gameData$)
 	declare readonly gameData: NonNullable<ObservedValueOf<typeof gameData$>>;
 
@@ -37,12 +39,14 @@ export class SearchBar extends LitElement {
 		this.searchIndex = 0;
 	}
 
-	private load(location: SearchIndexLocation) {
+	private async load(location: SearchIndexLocation) {
 		document
 			.querySelector('gs-menu')
 			?.selectPath([...path$.value.slice(0, 2).map(({ label }) => label), ...location.path]);
 
-		document.querySelectorAll('tr')[location.key]?.scrollIntoView();
+		await document.querySelector('gs-message-table')?.updateComplete;
+
+		document.querySelector(`tr#row-${location.key}`)?.scrollIntoView();
 	}
 
 	private search(targetEvent: TargetEvent<SlInput, InputEvent | CompositionEvent>) {
@@ -52,39 +56,43 @@ export class SearchBar extends LitElement {
 
 		const { currentTarget } = targetEvent;
 
-		if (!currentTarget.value) {
-			this.searchResult = undefined;
-			requestAnimationFrame(() => currentTarget.focus());
-			return;
-		}
+		window.clearTimeout(this.debounceTimer);
 
-		this.gameData.search?.postMessage(currentTarget.value);
-
-		this.searchResult = new Promise((resolve, reject) => {
-			const searchHandler = (event: MessageEvent) => {
+		this.debounceTimer = window.setTimeout(() => {
+			if (!currentTarget.value) {
+				this.searchResult = undefined;
 				requestAnimationFrame(() => currentTarget.focus());
+				return;
+			}
 
-				this.gameData.search?.removeEventListener('message', searchHandler);
+			this.gameData.search?.postMessage(currentTarget.value);
 
-				if (Array.isArray(event.data)) {
-					const locations: SearchIndexLocation[] = event.data.filter(({ locale }: SearchIndexLocation) =>
-						selectedLocales$.value.includes(locale),
-					);
+			this.searchResult = new Promise((resolve, reject) => {
+				const searchHandler = async (event: MessageEvent) => {
+					requestAnimationFrame(() => currentTarget.focus());
 
-					this.searchIndex = 0;
+					this.gameData.search?.removeEventListener('message', searchHandler);
 
-					if (locations.length) {
-						this.load(locations[0]);
+					if (Array.isArray(event.data)) {
+						const locations: SearchIndexLocation[] = event.data.filter(({ locale }: SearchIndexLocation) =>
+							selectedLocales$.value.includes(locale),
+						);
+
+						this.searchIndex = 0;
+
+						if (locations.length) {
+							await this.load(locations[0]);
+						}
+
+						resolve(locations);
+					} else {
+						reject();
 					}
+				};
 
-					resolve(locations);
-				} else {
-					reject();
-				}
-			};
-
-			this.gameData.search?.addEventListener('message', searchHandler);
-		});
+				this.gameData.search?.addEventListener('message', searchHandler);
+			});
+		}, 250);
 	}
 
 	private stepSearchResult(direction: 1 | -1): () => Promise<void> {
@@ -92,7 +100,7 @@ export class SearchBar extends LitElement {
 			const locations = (await this.searchResult) ?? [];
 			const { length } = locations;
 			this.searchIndex = (((this.searchIndex + direction) % length) + length) % length;
-			this.load(locations[this.searchIndex]);
+			await this.load(locations[this.searchIndex]);
 		};
 	}
 

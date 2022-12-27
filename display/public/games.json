@@ -4,7 +4,7 @@
 			"root": "skyward-sword",
 			"messageFormat": {
 				"*": {
-					"*": "dict"
+					"*": null
 				}
 			},
 			"locales": ["de-DE", "en-GB", "ja-JP"],
@@ -22,7 +22,7 @@
 			"root": "skyward-sword-hd",
 			"messageFormat": {
 				"*": {
-					"*": "dict"
+					"*": null
 				}
 			},
 			"locales": [
@@ -56,7 +56,7 @@
 		"Link's Awakening": {
 			"root": "links-awakening",
 			"messageFormat": {
-				"*": "dict"
+				"*": null
 			},
 			"locales": [
 				"de-DE",
@@ -91,9 +91,9 @@
 		"Final Fantasy IX": {
 			"root": "final-fantasy-9",
 			"messageFormat": {
-				"localization.txt": "dict",
+				"localization.txt": null,
 				"*": {
-					"*": "list"
+					"*": null
 				}
 			},
 			"locales": ["de-DE", "en-GB", "en-US", "es-ES", "fr-FR", "it-IT", "ja-JP"],

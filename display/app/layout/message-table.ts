@@ -146,7 +146,7 @@ export class MessageTable extends LitElement {
 					([key]) => key,
 					([key, message]) => {
 						return html`
-							<tr id="key">
+							<tr id=${`row-${key}`}>
 								${when(!Array.isArray(this.messages), () => html`<td>${key}</td>`)}
 								${when(
 									this.focusedLocale,
@@ -188,5 +188,11 @@ ${this.renderMessage(message[locale])}</pre
 				)}
 			</table>
 		`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'gs-message-table': MessageTable;
 	}
 }
