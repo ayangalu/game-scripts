@@ -14,7 +14,6 @@ export const mogIconOpCode = Object.fromEntries(
 
 const dbAll = new CSharpFile(path.join(dataPath, 'FF9DBAll.cs'));
 
-export const eventDB = dbAll.parseObjectField<string>('EventDB');
 export const messageDB = dbAll.parseObjectField<string>('MesDB');
 
 const dbBattle = new CSharpFile(path.join(dataPath, 'FF9BattleDB.cs'));
