@@ -1,8 +1,8 @@
 import { writeFileSync } from 'node:fs';
 
-import { HtmlTools } from '../../html-tools';
-import { iconMap } from './assembly-data';
-import { aligned } from './load-messages';
+import { HtmlTools } from '../../html-tools.mjs';
+import { iconMap } from './assembly-data.mjs';
+import { aligned } from './load-messages.mjs';
 
 type Transformer = (data: { openMarkupTags: string[]; locale: string; parameters: string[] }) => string;
 

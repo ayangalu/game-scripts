@@ -1,9 +1,9 @@
 import { repeat, DataType } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
-import type { FormatTree, ShiftControl } from './format';
-import { closeMarkup, isShiftCode, processShiftCode } from './format';
-import { processLabelBlock, LMS } from './lms';
+import type { FormatTree, ShiftControl } from './format.mjs';
+import { closeMarkup, isShiftCode, processShiftCode } from './format.mjs';
+import { processLabelBlock, LMS } from './lms.mjs';
 
 type Message = Array<string | ShiftControl>;
 
@@ -27,17 +27,17 @@ export class MSBT extends LMS<Blocks> {
 		super(source, 'MsgStdBn', [3], {
 			LBL1: processLabelBlock,
 			TSY1: (reader) => {
-				return repeat(reader.buffer.length / 4, () => reader.next(DataType.Uint32).value);
+				return repeat(reader.buffer.length / 4, () => reader.next(DataType.Uint32));
 			},
 			TXT2: (reader, encoding) => {
-				return repeat(reader.next(DataType.Uint32).value, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(reader.next(DataType.Uint32), () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
 
 					const openMarkupTags: string[] = [];
 					const message: Message = [];
 
 					let string = '';
-					let char = reader.next(DataType.char(encoding)).value;
+					let char = reader.next(DataType.char(encoding));
 
 					while (char !== '\0') {
 						const code = char.codePointAt(0);
@@ -53,7 +53,7 @@ export class MSBT extends LMS<Blocks> {
 							string += encode(char);
 						}
 
-						char = reader.next(DataType.char(encoding)).value;
+						char = reader.next(DataType.char(encoding));
 					}
 
 					if (string) {

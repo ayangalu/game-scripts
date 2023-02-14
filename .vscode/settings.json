@@ -1,8 +1,8 @@
 {
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"html.customData": ["./node_modules/@shoelace-style/shoelace/dist/vscode.html-custom-data.json"],
-	"[json][javascript][typescript][css]": {
-	"editor.formatOnSave": true,
+	"[json][jsonc][javascript][typescript][css]": {
+		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[javascript][typescript]": {
@@ -10,4 +10,16 @@
 			"source.fixAll.eslint": true
 		}
 	},
+	"inspectorHex.customDecoders": {
+		"Final Fantasy X (US)": "./tools/games/final-fantasy-10/decoders/us.decoder.ts",
+		"Final Fantasy X (KR)": "./tools/games/final-fantasy-10/decoders/kr.decoder.ts",
+		"Final Fantasy X (CH)": "./tools/games/final-fantasy-10/decoders/ch.decoder.ts",
+		"Final Fantasy X (JP)": "./tools/games/final-fantasy-10/decoders/jp.decoder.ts"
+	},
+	"inspectorHex.defaultDecoders": {
+		"data/final-fantasy-10-hd/extract/**/new_jppc/battle/btl/**/*.bin": "Final Fantasy X (JP)",
+		"data/final-fantasy-10-hd/extract/**/new_chpc/battle/btl/**/*.bin": "Final Fantasy X (CH)",
+		"data/final-fantasy-10-hd/extract/**/new_krpc/battle/btl/**/*.bin": "Final Fantasy X (KR)",
+		"data/final-fantasy-10-hd/extract/**/new_{us,de,it,fr,sp}pc/battle/btl/**/*.bin": "Final Fantasy X (US)"
+	}
 }

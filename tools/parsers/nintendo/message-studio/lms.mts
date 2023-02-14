@@ -9,16 +9,16 @@ type BlockProcessorCollection<T extends Record<string, unknown>> = {
 };
 
 export function processLabelBlock(reader: BinaryReader) {
-	return repeat(reader.next(DataType.Uint32).value, () => {
-		const labelCount = reader.next(DataType.Uint32).value;
-		const offset = reader.next(DataType.Uint32).value;
+	return repeat(reader.next(DataType.Uint32), () => {
+		const labelCount = reader.next(DataType.Uint32);
+		const offset = reader.next(DataType.Uint32);
 		return { labelCount, offset };
 	}).reduce<string[]>((labels, { labelCount, offset }) => {
 		reader.seek(offset);
 		repeat(labelCount, () => {
-			const length = reader.next(DataType.Uint8).value;
-			const label = reader.next(DataType.string(Encoding.ASCII, { count: length })).value;
-			const index = reader.next(DataType.Uint32).value;
+			const length = reader.next(DataType.Uint8);
+			const label = reader.next(DataType.string(Encoding.ASCII, { count: length }));
+			const index = reader.next(DataType.Uint32);
 			labels[index] = label;
 		});
 		return labels;
@@ -48,9 +48,9 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 
 		reader.skip(2);
 
-		const encoding = reader.next(DataType.Uint8).value;
-		const version = reader.next(DataType.Uint8).value;
-		const blockCount = reader.next(DataType.Uint16).value;
+		const encoding = reader.next(DataType.Uint8);
+		const version = reader.next(DataType.Uint8);
+		const blockCount = reader.next(DataType.Uint16);
 
 		/* prettier-ignore */
 		switch (encoding) {
@@ -66,7 +66,7 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 
 		reader.skip(2);
 
-		if (reader.next(DataType.Uint32).value !== reader.buffer.length) {
+		if (reader.next(DataType.Uint32) !== reader.buffer.length) {
 			throw new Error(`unexpected file size`);
 		}
 
@@ -75,8 +75,8 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 		this.blocks = {};
 
 		repeat(blockCount, () => {
-			const name = reader.next(DataType.string(Encoding.ASCII, { count: 4 })).value;
-			const size = reader.next(DataType.Uint32).value;
+			const name = reader.next(DataType.string(Encoding.ASCII, { count: 4 }));
+			const size = reader.next(DataType.Uint32);
 
 			reader.skip(8);
 

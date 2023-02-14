@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { CSharpFile } from '../../parsers/csharp';
+import { CSharpFile } from '../../parsers/csharp/index.mjs';
 
 const dataPath = `data/final-fantasy-9/extract/Assembly-CSharp`;
 

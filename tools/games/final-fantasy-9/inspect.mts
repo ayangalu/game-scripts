@@ -1,4 +1,4 @@
-import { aligned } from './load-messages';
+import { aligned } from './load-messages.mjs';
 
 const find = (text: string) => {
 	Object.entries(aligned).forEach(([category, files]) =>

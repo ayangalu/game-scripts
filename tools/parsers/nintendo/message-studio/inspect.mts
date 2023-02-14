@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 
-import { U8 } from '../u8';
-import { MSBT } from './msbt';
+import { U8 } from '../u8.mjs';
+import { MSBT } from './msbt.mjs';
 
 export function readMSBT(source: string) {
 	return Object.fromEntries(

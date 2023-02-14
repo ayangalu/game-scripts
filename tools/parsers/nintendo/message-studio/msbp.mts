@@ -1,6 +1,6 @@
 import { repeat, DataType, Encoding } from '@nishin/reader';
 
-import { processLabelBlock, LMS } from './lms';
+import { processLabelBlock, LMS } from './lms.mjs';
 
 type Color = [number, number, number, number];
 
@@ -125,91 +125,91 @@ export class MSBP extends LMS<Blocks> {
 	constructor(source: string | Buffer) {
 		super(source, 'MsgPrjBn', [4], {
 			CLR1: (reader) => {
-				return repeat(reader.next(DataType.Uint32).value, () => {
-					return reader.next(DataType.array(DataType.Uint8, 4)).value as Color;
+				return repeat(reader.next(DataType.Uint32), () => {
+					return reader.next(DataType.array(DataType.Uint8, 4)) as Color;
 				});
 			},
 			CLB1: processLabelBlock,
 			ATI2: (reader) => {
-				return repeat(reader.next(DataType.Uint32).value, () => {
-					const type = reader.next(DataType.Uint8).value;
+				return repeat(reader.next(DataType.Uint32), () => {
+					const type = reader.next(DataType.Uint8);
 					reader.skip(1);
-					const index = reader.next(DataType.Uint16).value;
-					const offset = reader.next(DataType.Uint32).value;
+					const index = reader.next(DataType.Uint16);
+					const offset = reader.next(DataType.Uint32);
 					return { type, index, offset };
 				});
 			},
 			ALB1: processLabelBlock,
 			ALI2: (reader) => {
-				return repeat(reader.next(DataType.Uint32).value, () => reader.next(DataType.Uint32).value).map((listOffset) => {
+				return repeat(reader.next(DataType.Uint32), () => reader.next(DataType.Uint32)).map((listOffset) => {
 					reader.seek(listOffset);
-					return repeat(reader.next(DataType.Uint32).value, () => reader.next(DataType.Uint32).value).map((itemOffset) => {
+					return repeat(reader.next(DataType.Uint32), () => reader.next(DataType.Uint32)).map((itemOffset) => {
 						reader.seek(listOffset + itemOffset);
-						return reader.next(DataType.string(Encoding.ASCII)).value;
+						return reader.next(DataType.string(Encoding.ASCII));
 					});
 				});
 			},
 			TGG2: (reader) => {
 				// TODO: verify that this is really Uint16
-				const count = reader.next(DataType.Uint16).value;
+				const count = reader.next(DataType.Uint16);
 				reader.skip(2);
-				return repeat(count, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(count, () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					const unknown = reader.next(DataType.Uint16).value;
-					const tags = repeat(reader.next(DataType.Uint16).value, () => reader.next(DataType.Uint16).value);
-					const name = reader.next(DataType.string(Encoding.ASCII)).value;
+					const unknown = reader.next(DataType.Uint16);
+					const tags = repeat(reader.next(DataType.Uint16), () => reader.next(DataType.Uint16));
+					const name = reader.next(DataType.string(Encoding.ASCII));
 					return { name, tags, unknown };
 				});
 			},
 			TAG2: (reader) => {
-				const count = reader.next(DataType.Uint16).value;
+				const count = reader.next(DataType.Uint16);
 				reader.skip(2);
-				return repeat(count, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(count, () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					const parameters = repeat(reader.next(DataType.Uint16).value, () => reader.next(DataType.Uint16).value);
-					const name = reader.next(DataType.string(Encoding.ASCII)).value;
+					const parameters = repeat(reader.next(DataType.Uint16), () => reader.next(DataType.Uint16));
+					const name = reader.next(DataType.string(Encoding.ASCII));
 					return { name, parameters };
 				});
 			},
 			TGP2: (reader) => {
-				const count = reader.next(DataType.Uint16).value;
+				const count = reader.next(DataType.Uint16);
 				reader.skip(2);
-				return repeat(count, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(count, () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					const type = reader.next(DataType.Uint8).value;
+					const type = reader.next(DataType.Uint8);
 					if (type === 9) {
 						reader.skip(1);
-						const listItems = repeat(reader.next(DataType.Uint16).value, () => reader.next(DataType.Uint16).value);
-						const name = reader.next(DataType.string(Encoding.ASCII)).value;
+						const listItems = repeat(reader.next(DataType.Uint16), () => reader.next(DataType.Uint16));
+						const name = reader.next(DataType.string(Encoding.ASCII));
 						return { type, name, listItems };
 					}
-					const name = reader.next(DataType.string(Encoding.ASCII)).value;
+					const name = reader.next(DataType.string(Encoding.ASCII));
 					return { type, name, listItems: [] };
 				});
 			},
 			TGL2: (reader) => {
-				const count = reader.next(DataType.Uint16).value;
+				const count = reader.next(DataType.Uint16);
 				reader.skip(2);
-				return repeat(count, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(count, () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					return reader.next(DataType.string(Encoding.ASCII)).value;
+					return reader.next(DataType.string(Encoding.ASCII));
 				});
 			},
 			SYL3: (reader) => {
-				return repeat(reader.next(DataType.Uint32).value, () => {
+				return repeat(reader.next(DataType.Uint32), () => {
 					return {
-						regionWidth: reader.next(DataType.Uint32).value,
-						lineNumber: reader.next(DataType.Uint32).value,
-						fontIndex: reader.next(DataType.Uint32).value,
-						baseColorIndex: reader.next(DataType.Uint32).value,
+						regionWidth: reader.next(DataType.Uint32),
+						lineNumber: reader.next(DataType.Uint32),
+						fontIndex: reader.next(DataType.Uint32),
+						baseColorIndex: reader.next(DataType.Uint32),
 					};
 				});
 			},
 			SLB1: processLabelBlock,
 			CTI1: (reader) => {
-				return repeat(reader.next(DataType.Uint32).value, () => reader.next(DataType.Uint32).value).map((offset) => {
+				return repeat(reader.next(DataType.Uint32), () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					return reader.next(DataType.string(Encoding.ASCII)).value;
+					return reader.next(DataType.string(Encoding.ASCII));
 				});
 			},
 		});

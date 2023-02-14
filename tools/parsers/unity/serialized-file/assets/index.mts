@@ -1,9 +1,9 @@
 import type { BinaryReader } from '@nishin/reader';
 
-import { ResourceManager } from './resource-manager';
-import { TextAsset } from './text-asset';
+import { ResourceManager } from './resource-manager.mjs';
+import { TextAsset } from './text-asset.mjs';
 
-export * from './resource-manager';
+export * from './resource-manager.mjs';
 
 export type Asset = ResourceManager | TextAsset;
 

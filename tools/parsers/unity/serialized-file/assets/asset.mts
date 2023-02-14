@@ -13,13 +13,13 @@ export abstract class Asset {
 	}
 
 	protected readAlignedString() {
-		const length = this.reader.next(DataType.Int32).value;
+		const length = this.reader.next(DataType.Int32);
 
 		if (length <= 0 || length > this.reader.byteLength - this.reader.offset) {
 			return '';
 		}
 
-		const data = this.reader.next(DataType.array(DataType.Uint8, length)).value;
+		const data = this.reader.next(DataType.array(DataType.Uint8, length));
 
 		this.reader.align(4);
 

@@ -3,8 +3,8 @@ import path from 'node:path';
 
 import { DataType } from '@nishin/reader';
 
-import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format';
-import { ensure } from '../../ensure';
+import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format.mjs';
+import { ensure } from '../../ensure.mjs';
 import {
 	capitalizationFormatter,
 	colorFormatter,
@@ -12,9 +12,9 @@ import {
 	rubyFormatter,
 	variableFormatter,
 	ShiftCode,
-} from '../../parsers/nintendo/message-studio/format';
-import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
-import { U8 } from '../../parsers/nintendo/u8';
+} from '../../parsers/nintendo/message-studio/format.mjs';
+import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+import { U8 } from '../../parsers/nintendo/u8.mjs';
 
 const commonEmoji = {
 	0x00: ['button-a'],
@@ -294,7 +294,7 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 				0x0000: {
 					0x0000: rubyFormatter(),
 					0x0003: colorFormatter<number>({
-						lookup: (parameters) => parameters.next(DataType.Uint16).value,
+						lookup: (parameters) => parameters.next(DataType.Uint16),
 						reset: [0xffff],
 						colors: {
 							0x0000: 'emphasis',

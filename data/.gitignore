@@ -1,6 +1,7 @@
 *.png
 *.csv
 *.txt
+*.exe
 
 romfs
 *.brfnt
@@ -17,3 +18,5 @@ unity*
 *.list
 embeddedasset
 Assembly-CSharp
+
+extract/

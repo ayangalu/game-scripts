@@ -1,4 +1,4 @@
-import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect';
+import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect.mjs';
 
 const msbts = readMSBT(`data/${process.argv[2]}${process.argv[3] ?? ''}/messages`);
 

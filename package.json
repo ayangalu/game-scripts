@@ -1,8 +1,8 @@
 {
 	"name": "game-scripts",
 	"scripts": {
-		"dump": "ts-node -P tsconfig.tools.json --transpile-only tools/dump.ts",
-		"inspect": "ts-node -P tsconfig.tools.json --transpile-only tools/inspect.ts",
+		"dump": "tsx --no-warnings --tsconfig ./tsconfig.tsx.json ./tools/dump.mts",
+		"inspect": "tsx --no-warnings --tsconfig ./tsconfig.tsx.json ./tools/inspect.mts",
 		"serve": "vite serve display",
 		"preview": "vite preview display",
 		"build": "vite build display"
@@ -16,26 +16,32 @@
 		"zod": "3.20.2"
 	},
 	"devDependencies": {
-		"@nishin/reader": "0.3.1",
+		"@inspector-hex/decoder-api": "0.3.6",
+		"@nishin/node-file-reader": "0.4.1",
+		"@nishin/reader": "0.4.1",
 		"@tswt/dedicated-worker": "0.0.1-alpha.10",
 		"@tswt/window": "0.0.1-alpha.10",
-		"@types/lodash": "4.14.189",
-		"@types/node": "18.11.9",
-		"@typescript-eslint/eslint-plugin": "5.43.0",
-		"@typescript-eslint/parser": "5.43.0",
+		"@types/lodash-es": "4.17.6",
+		"@types/node": "18.11.18",
+		"@typescript-eslint/eslint-plugin": "5.48.0",
+		"@typescript-eslint/parser": "5.48.0",
 		"csv": "6.2.2",
 		"csv-parse": "5.3.2",
-		"eslint": "8.27.0",
+		"esbuild": "0.17.8",
+		"eslint": "8.31.0",
 		"eslint-plugin-style": "0.2.0",
 		"fast-png": "6.1.0",
 		"html-entities": "2.3.3",
 		"html-validate": "7.9.0",
-		"lodash": "4.17.21",
-		"prettier": "2.7.1",
+		"lodash-es": "4.17.21",
+		"log-update": "5.0.1",
+		"observable-fns": "0.6.1",
+		"prettier": "2.8.2",
+		"threads": "1.7.0",
 		"tree-sitter": "0.20.1",
 		"tree-sitter-c-sharp": "0.20.0",
-		"ts-node": "10.9.1",
-		"typescript": "4.8.4",
+		"tsx": "3.12.1",
+		"typescript": "4.9.4",
 		"vite": "3.2.4"
 	}
 }

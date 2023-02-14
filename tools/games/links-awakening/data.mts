@@ -1,12 +1,12 @@
 import { DataType } from '@nishin/reader';
 
-import type { FormatTree } from '../../parsers/nintendo/message-studio/format';
+import type { FormatTree } from '../../parsers/nintendo/message-studio/format.mjs';
 import {
 	colorFormatter,
 	rubyFormatter,
 	variableFormatter,
 	ShiftCode,
-} from '../../parsers/nintendo/message-studio/format';
+} from '../../parsers/nintendo/message-studio/format.mjs';
 
 const colors = {
 	'6cd2ffff': 'info',
@@ -124,7 +124,7 @@ export const shiftFormats: FormatTree = {
 				(icon) => `<span class="emoji ${icon}"></span>`,
 			),
 			0x0002: ({ parameters }) => {
-				const index = parameters.next(DataType.Uint8).value;
+				const index = parameters.next(DataType.Uint8);
 				return String.fromCodePoint(0x2460 + index);
 			},
 			0x0003: () => `<player-name character="tloz:link"></player-name>`,
@@ -135,7 +135,7 @@ export const shiftFormats: FormatTree = {
 
 				const lastOffset = reader.offset;
 
-				if (reader.next(DataType.Uint8).value === 0x0a) {
+				if (reader.next(DataType.Uint8) === 0x0a) {
 					markup += `<li>`;
 					openMarkupTags.unshift('li');
 				} else {
@@ -146,14 +146,14 @@ export const shiftFormats: FormatTree = {
 			},
 			0x000a: () => `<span class="placeholder">＃</span>`,
 			0x0012: ({ parameters, encoding }) => {
-				const count = parameters.next(DataType.Uint16).value;
-				return parameters.slice(count).next(DataType.string(encoding)).value;
+				const count = parameters.next(DataType.Uint16);
+				return parameters.slice(count).next(DataType.string(encoding));
 			},
 			0x0013: ({ parameters, encoding }) => {
-				const moeumCount = parameters.next(DataType.Uint16).value;
-				const moeum = parameters.slice(moeumCount).next(DataType.string(encoding)).value;
-				const batchimCount = parameters.next(DataType.Uint16).value;
-				const batchim = parameters.slice(batchimCount).next(DataType.string(encoding)).value;
+				const moeumCount = parameters.next(DataType.Uint16);
+				const moeum = parameters.slice(moeumCount).next(DataType.string(encoding));
+				const batchimCount = parameters.next(DataType.Uint16);
+				const batchim = parameters.slice(batchimCount).next(DataType.string(encoding));
 				return `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`;
 			},
 		},

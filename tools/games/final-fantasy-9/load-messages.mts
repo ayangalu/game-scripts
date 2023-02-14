@@ -3,10 +3,10 @@ import path from 'node:path';
 
 import { parse as csvParse } from 'csv-parse/sync';
 
-import type { Alignment } from './alignments';
-import { SerializedFile } from '../../parsers/unity/serialized-file';
-import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments';
-import { eventMessageMap, messageDB, mogIconOpCode, sceneData } from './assembly-data';
+import type { Alignment } from './alignments.mjs';
+import { SerializedFile } from '../../parsers/unity/serialized-file/index.mjs';
+import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments.mjs';
+import { eventMessageMap, messageDB, mogIconOpCode, sceneData } from './assembly-data.mjs';
 
 const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;
 const textRoot = path.join(assetsRoot, 'text');

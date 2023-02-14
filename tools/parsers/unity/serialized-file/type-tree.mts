@@ -1,7 +1,7 @@
 import type { BinaryReader } from '@nishin/reader';
 import { repeat, DataType, Encoding } from '@nishin/reader';
 
-import { Version } from './version';
+import { Version } from './version.mjs';
 
 export interface TypeTreeNode {
 	readonly type: string;
@@ -32,18 +32,18 @@ export class TypeTree {
 		nodes: TypeTreeNode[] = [],
 		level = 0,
 	): TypeTreeNode[] {
-		const type = reader.next(DataType.string(Encoding.UTF8)).value;
-		const name = reader.next(DataType.string(Encoding.UTF8)).value;
-		const size = reader.next(DataType.Int32).value;
+		const type = reader.next(DataType.string(Encoding.UTF8));
+		const name = reader.next(DataType.string(Encoding.UTF8));
+		const size = reader.next(DataType.Int32);
 
 		if (version === Version.Unknown2) {
 			reader.skip(4);
 		}
 
-		const index = version !== Version.Unknown3 ? reader.next(DataType.Int32).value : undefined;
-		const typeFlags = reader.next(DataType.Int32).value;
-		const nodeVersion = reader.next(DataType.Int32).value;
-		const metaFlag = version !== Version.Unknown3 ? reader.next(DataType.Int32).value : undefined;
+		const index = version !== Version.Unknown3 ? reader.next(DataType.Int32) : undefined;
+		const typeFlags = reader.next(DataType.Int32);
+		const nodeVersion = reader.next(DataType.Int32);
+		const metaFlag = version !== Version.Unknown3 ? reader.next(DataType.Int32) : undefined;
 
 		nodes.push({
 			type,
@@ -56,29 +56,29 @@ export class TypeTree {
 			level,
 		});
 
-		repeat(reader.next(DataType.Int32).value, () => this.readRecursive(reader, version, nodes, level + 1));
+		repeat(reader.next(DataType.Int32), () => this.readRecursive(reader, version, nodes, level + 1));
 
 		return nodes;
 	}
 
 	private readBlob(reader: BinaryReader<Buffer>, version: number): TypeTreeNode[] {
 		const offsets = new Map<TypeTreeNode, { type: number; name: number }>();
-		const nodeCount = reader.next(DataType.Int32).value;
-		const stringBufferSize = reader.next(DataType.Int32).value;
+		const nodeCount = reader.next(DataType.Int32);
+		const stringBufferSize = reader.next(DataType.Int32);
 
 		const nodes = repeat(nodeCount, () => {
-			const nodeVersion = reader.next(DataType.Uint16).value;
-			const level = reader.next(DataType.Uint8).value;
-			const typeFlags = reader.next(DataType.Uint8).value;
+			const nodeVersion = reader.next(DataType.Uint16);
+			const level = reader.next(DataType.Uint8);
+			const typeFlags = reader.next(DataType.Uint8);
 
 			const offset = {
-				type: reader.next(DataType.Uint32).value,
-				name: reader.next(DataType.Uint32).value,
+				type: reader.next(DataType.Uint32),
+				name: reader.next(DataType.Uint32),
 			};
 
-			const size = reader.next(DataType.Int32).value;
-			const index = reader.next(DataType.Int32).value;
-			const metaFlag = reader.next(DataType.Int32).value;
+			const size = reader.next(DataType.Int32);
+			const index = reader.next(DataType.Int32);
+			const metaFlag = reader.next(DataType.Int32);
 
 			const node: TypeTreeNode = {
 				type: '',
@@ -93,7 +93,7 @@ export class TypeTree {
 
 			if (version >= Version.TypeTreeNodeWithTypeFlags) {
 				// @ts-expect-error
-				node.referenceTypeHash = reader.next(DataType.BigUint64).value;
+				node.referenceTypeHash = reader.next(DataType.BigUint64);
 			}
 
 			offsets.set(node, offset);
@@ -122,7 +122,7 @@ export class TypeTree {
 	private readBlobString(reader: BinaryReader<Buffer>, value: number) {
 		if (!(value & 0x80000000)) {
 			reader.seek(value);
-			return reader.next(DataType.string(Encoding.UTF8)).value;
+			return reader.next(DataType.string(Encoding.UTF8));
 		}
 
 		throw new Error(`TODO?: lookup common strings`);

@@ -1,5 +1,5 @@
 import type { BinaryReader, Encoding, SafeIntBytes } from '@nishin/reader';
-import { DataType } from '@nishin/reader';
+import { DataType, ReadMode } from '@nishin/reader';
 import { encode as htmlEncode } from 'html-entities';
 
 export const enum ShiftCode {
@@ -54,12 +54,12 @@ export function processShiftCode(
 ): ShiftControl | string {
 	const control: Mutable<ShiftControl> = {
 		code,
-		group: reader.next(DataType.Uint16).value,
-		tag: reader.next(DataType.Uint16).value,
+		group: reader.next(DataType.Uint16),
+		tag: reader.next(DataType.Uint16),
 	};
 
 	if (code === ShiftCode.Out) {
-		const parameterByteCount = reader.next(DataType.Uint16).value;
+		const parameterByteCount = reader.next(DataType.Uint16);
 		control.parameters = reader.slice(parameterByteCount);
 	}
 
@@ -95,12 +95,12 @@ export function hex(value: number, length?: number) {
 
 export function rubyFormatter(): ShiftOutFormatter {
 	return ({ reader, encoding, parameters }) => {
-		const byteCountBase = parameters.next(DataType.Uint16).value;
-		const byteCountRuby = parameters.next(DataType.Uint16).value;
+		const byteCountBase = parameters.next(DataType.Uint16);
+		const byteCountRuby = parameters.next(DataType.Uint16);
 
-		const rubyText = parameters.next(DataType.string(encoding));
+		const rubyText = parameters.next(DataType.string(encoding), ReadMode.Source);
 
-		if (rubyText.byteLength !== byteCountRuby) {
+		if (rubyText.source.byteLength !== byteCountRuby) {
 			throw new Error(`ruby text byte count mismatch`);
 		}
 
@@ -108,9 +108,9 @@ export function rubyFormatter(): ShiftOutFormatter {
 		let base = '';
 
 		while (baseBytesRead < byteCountBase) {
-			const char = reader.next(DataType.char(encoding));
+			const char = reader.next(DataType.char(encoding), ReadMode.Source);
 			base += htmlEncode(char.value);
-			baseBytesRead += char.byteLength;
+			baseBytesRead += char.source.byteLength;
 		}
 
 		if (baseBytesRead !== byteCountBase) {
@@ -164,7 +164,7 @@ export function variableFormatter<T>(
 	template = (variable: T) => `${variable}`,
 ): ShiftOutFormatter {
 	return ({ parameters }) => {
-		const option = parameters.next(DataType.int({ signed: false, byteLength })).value;
+		const option = parameters.next(DataType.int({ signed: false, byteLength }));
 		if (typeof variables[option] !== 'undefined') {
 			return template(variables[option]!);
 		}
@@ -174,7 +174,7 @@ export function variableFormatter<T>(
 
 export function capitalizationFormatter(): ShiftOutFormatter {
 	return ({ reader, encoding, openMarkupTags, tagFormatters }) => {
-		let char = reader.next(DataType.char(encoding)).value;
+		let char = reader.next(DataType.char(encoding));
 		const code = char.codePointAt(0);
 
 		if (isShiftCode(code)) {

@@ -1,12 +1,12 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { merge, mergeWith } from 'lodash';
+import { merge, mergeWith } from 'lodash-es';
 
-import { HtmlTools } from '../../html-tools';
-import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
-import { U8 } from '../../parsers/nintendo/u8';
-import { data } from './data';
+import { HtmlTools } from '../../html-tools.mjs';
+import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+import { U8 } from '../../parsers/nintendo/u8.mjs';
+import { data } from './data.mjs';
 
 const htmlTools = new HtmlTools('skyward-sword');
 
@@ -21,7 +21,7 @@ const lineCounts: Record<string, number> = {
 	nl: 4,
 	ru: 4,
 	zh: 3,
-} as const;
+};
 
 [
 	{

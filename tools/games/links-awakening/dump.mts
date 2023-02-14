@@ -1,11 +1,11 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { merge } from 'lodash';
+import { merge } from 'lodash-es';
 
-import { HtmlTools } from '../../html-tools';
-import { MSBT } from '../../parsers/nintendo/message-studio/msbt';
-import { shiftFormats } from './data';
+import { HtmlTools } from '../../html-tools.mjs';
+import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+import { shiftFormats } from './data.mjs';
 
 const htmlTools = new HtmlTools('links-awakening');
 
