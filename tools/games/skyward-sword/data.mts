@@ -3,17 +3,22 @@ import path from 'node:path';
 
 import { DataType } from '@nishin/reader';
 
-import type { FormatTree, ShiftOutFormatter } from '../../parsers/nintendo/message-studio/format.mjs';
+import type {
+	BeginTransformer,
+	MarkupTag,
+	OpeningTag,
+	TransformerTree,
+} from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { ensure } from '../../ensure.mjs';
+import { hex } from '../../format.mjs';
+import { capitalizationMacro } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { placeholderTransformer, variableTransformer } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import {
-	capitalizationFormatter,
-	colorFormatter,
-	hex,
-	rubyFormatter,
-	variableFormatter,
-	ShiftCode,
-} from '../../parsers/nintendo/message-studio/format.mjs';
-import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+	colorTransformer,
+	formatMessage,
+	rubyTransformer,
+} from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { ControlCode, MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { U8 } from '../../parsers/nintendo/u8.mjs';
 
 const commonEmoji = {
@@ -196,47 +201,42 @@ const josa = {
 	0x05: ['로', '으로'],
 };
 
-function choiceFormatter(index: number): ShiftOutFormatter {
-	return ({ openMarkupTags }) => {
-		let markup = '';
+function choiceTransformer(index: number): BeginTransformer<{}> {
+	return ({ state: { openTags } }) => {
+		const tokens: Array<string | MarkupTag> = [];
 
-		const moveSpans: string[] = [];
+		const moveSpans: OpeningTag[] = [];
 
-		while (openMarkupTags[0]?.startsWith('span')) {
-			moveSpans.unshift(openMarkupTags.shift()!);
-			markup += `</span>`;
+		while (openTags[0]?.name === 'span') {
+			moveSpans.unshift(openTags.shift()!);
+			tokens.push({ name: 'span', type: 'closing' });
 		}
 
 		if (index === 0) {
-			openMarkupTags.unshift('ul');
-			markup += '<ul>';
+			openTags.unshift({ name: 'ul', type: 'opening' });
+			tokens.push(openTags[0]);
 		} else {
 			// expect last tag to be choice item
-			openMarkupTags.shift();
-			markup += `</li>`;
+			openTags.shift();
+			tokens.push({ name: 'li', type: 'closing' });
 		}
 
 		const classList = ['choice', `option-${index + 1}`];
 
-		markup += `<li class="${classList.join(' ')}">`;
+		openTags.unshift({ name: 'li', type: 'opening', classList });
+		tokens.push(openTags[0]);
+		tokens.push(...moveSpans);
+		openTags.unshift(...moveSpans.reverse());
 
-		for (const selector of moveSpans) {
-			const spanClassList = selector.split('.').slice(1);
-			markup += `<span class="${spanClassList.join(' ')}">`;
-		}
-
-		openMarkupTags.unshift(`li.${classList.join('.')}`);
-		openMarkupTags.unshift(...moveSpans.reverse());
-
-		return markup;
+		return tokens;
 	};
 }
 
-function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
-	const minimalFormatters = {
-		[ShiftCode.Out]: {
+function buildTransformers(version: 'skyward-sword' | 'skyward-sword-hd') {
+	const minimalTransformers = {
+		[ControlCode.Begin]: {
 			0x0000: {
-				0x0000: rubyFormatter(),
+				0x0000: rubyTransformer(),
 			},
 		},
 	};
@@ -248,13 +248,15 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 	});
 
 	const itemMap = archives.reduce<Record<string, Record<number, string>>>((resultMap, [locale, u8]) => {
-		const msbt = new MSBT(ensure(u8.files.find(({ name }) => name === '003-ItemGet.msbt')?.data), minimalFormatters);
-		resultMap[locale] = msbt.entries.filter(({ label }) => label.startsWith('NAME_ITEM_')).map(({ value }) => value);
+		const msbt = new MSBT(ensure(u8.files.find(({ name }) => name === '003-ItemGet.msbt')?.data));
+		resultMap[locale] = msbt.entries
+			.filter(({ label }) => label.startsWith('NAME_ITEM_'))
+			.map(({ message }) => formatMessage(message, {}, minimalTransformers));
 		return resultMap;
 	}, {});
 
 	const wordMap = archives.reduce<Record<string, Record<number, string>>>((resultMap, [locale, u8]) => {
-		const msbt = new MSBT(ensure(u8.files.find(({ name }) => name === 'word.msbt')?.data), minimalFormatters);
+		const msbt = new MSBT(ensure(u8.files.find(({ name }) => name === 'word.msbt')?.data));
 
 		resultMap[locale] = msbt.entries
 			.filter(({ label }) => {
@@ -279,22 +281,22 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 				// 02 is the general plural form for other locales (or the same as the singular form)
 				return label.endsWith(':02');
 			})
-			.reduce<Record<number, string>>((result, { label, value }) => {
+			.reduce<Record<number, string>>((result, { label, message }) => {
 				const index = parseInt(ensure(/:(\d{3}):/.exec(label))[1]);
-				result[index] = value;
+				result[index] = formatMessage(message, {}, minimalTransformers);
 				return result;
 			}, {});
 
 		return resultMap;
 	}, {});
 
-	return (locale: string): FormatTree => {
+	return (locale: string): TransformerTree => {
 		return {
-			[ShiftCode.Out]: {
+			[ControlCode.Begin]: {
 				0x0000: {
-					0x0000: rubyFormatter(),
-					0x0003: colorFormatter<number>({
-						lookup: (parameters) => parameters.next(DataType.Uint16),
+					0x0000: rubyTransformer(),
+					0x0003: colorTransformer<number>({
+						lookup: (payload) => payload.next(DataType.Uint16),
 						reset: [0xffff],
 						colors: {
 							0x0000: 'emphasis',
@@ -314,53 +316,52 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 					}),
 				},
 				0x0001: {
-					0x0000: choiceFormatter(0),
-					0x0001: choiceFormatter(1),
-					0x0002: choiceFormatter(2),
-					0x0003: choiceFormatter(3),
+					0x0000: choiceTransformer(0),
+					0x0001: choiceTransformer(1),
+					0x0002: choiceTransformer(2),
+					0x0003: choiceTransformer(3),
 				},
 				0x0002: {
-					0x0000: () => `<player-name character="tloz:link"></player-name>`,
-					0x0001: variableFormatter(2, itemMap[locale], (option) => `<debug-token>2:1:${option}</debug-token>`),
-					0x0002: variableFormatter(
-						4,
-						Array.from({ length: 20 }).map((_, i) => String.fromCodePoint(0x2460 + i)),
-						(option) => `<debug-token>2:2:${option}</debug-token>`,
-						(content) => `<span class="placeholder">${content}</span>`,
-					),
-					0x0003: () => `<span class="placeholder">＃</span>`,
-					0x0004: variableFormatter(
-						1,
-						emoji[version],
-						(option) => `<debug-token>2:4:${option}</debug-token>`,
-						(classes) => `<span class="emoji ${classes.join(' ')}"></span>`,
-					),
-					0x0005: variableFormatter(
-						1,
-						controls,
-						(option) => `<debug-token>2:5:${option}</debug-token>`,
-						({ name, parts }) =>
-							`<span class="controls ${name.join(' ')}">${parts
-								.map((id) => `<span class="${id.join(' ')}"></span>`)
-								.join('')}</span>`,
-					),
+					0x0000: () => [
+						{ name: 'player-name', type: 'opening', attribute: { character: 'tloz:link' } },
+						{ name: 'player-name', type: 'closing' },
+					],
+					0x0001: variableTransformer(2, itemMap[locale]),
+					0x0002: placeholderTransformer((payload) => {
+						const index = payload.next(DataType.Uint32);
+						return hex(index, 4);
+					}),
+					0x0003: placeholderTransformer('#'),
+					0x0004: variableTransformer(1, emoji[version], (classes) => [
+						{ name: 'span', type: 'opening', classList: ['emoji', ...classes] },
+						{ name: 'span', type: 'closing' },
+					]),
+					0x0005: variableTransformer(1, controls, ({ name, parts }) => [
+						{ name: 'span', type: 'opening', classList: ['controls', ...name] },
+						...parts.flatMap(
+							(id) =>
+								[
+									{ name: 'span', type: 'opening', classList: id },
+									{ name: 'span', type: 'closing' },
+								] as const,
+						),
+						{ name: 'span', type: 'closing' },
+					]),
 				},
 				0x0003: {
-					0x0000: () => `<sup>`,
-					0x0001: capitalizationFormatter(),
-					0x0002: variableFormatter(
-						1,
-						josa,
-						(option) => `<debug-token>3:2:${option}</debug-token>`,
-						([moeum, batchim]) => `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`,
-					),
-					0x0003: variableFormatter(1, wordMap[locale], (option) => `[3:3:${hex(option)}]`),
-					0x0004: variableFormatter(1, wordMap[locale], (option) => `[3:4:${hex(option)}]`),
+					0x0000: () => ({ name: 'sup', type: 'opening' }),
+					0x0001: () => capitalizationMacro(locale),
+					0x0002: variableTransformer(1, josa, ([moeum, batchim]) => [
+						{ name: 'ko-josa', type: 'opening', attribute: { moeum, batchim } },
+						{ name: 'ko-josa', type: 'closing' },
+					]),
+					0x0003: variableTransformer(1, wordMap[locale]),
+					0x0004: variableTransformer(1, wordMap[locale]),
 				},
 			},
-			[ShiftCode.In]: {
+			[ControlCode.End]: {
 				0x0003: {
-					0x0000: () => `</sup>`,
+					0x0000: () => ({ name: 'sup', type: 'closing' }),
 				},
 			},
 		};
@@ -368,6 +369,6 @@ function buildFormatters(version: 'skyward-sword' | 'skyward-sword-hd') {
 }
 
 export const data = {
-	wii: buildFormatters('skyward-sword'),
-	switch: buildFormatters('skyward-sword-hd'),
+	wii: buildTransformers('skyward-sword'),
+	switch: buildTransformers('skyward-sword-hd'),
 };

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 
+import type { O } from 'ts-toolbelt';
 import { repeat, BinaryReader, DataType, Encoding } from '@nishin/reader';
 
 type BlockProcessor<T> = (reader: BinaryReader<Buffer>, encoding: Encoding) => T;
@@ -94,16 +95,52 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 		});
 	}
 
-	protected mapLabels<T>(labels: string[] = [], data: T[] = []): Array<{ label: string; value: T }> {
-		if (labels.length !== data.length) {
-			throw new Error(`data/labels mismatch`);
+	protected mapLabels<T extends Partial<Record<string, unknown[]>>>(
+		labels?: string[],
+		data?: T,
+	): Array<
+		{ label: string } & { [P in O.NonNullableKeys<T>]: NonNullable<T[P]>[number] } & {
+			[P in O.NullableKeys<T>]?: NonNullable<T[P]>[number];
+		}
+	>;
+	protected mapLabels<T>(labels?: string[], data?: T[]): Array<{ label: string; value: T }>;
+	protected mapLabels(labels: string[] = [], data?: any[] | Record<string, any[] | undefined>): any {
+		if (!data) {
+			return [];
 		}
 
-		return labels.map((label, index) => {
-			return {
-				label,
-				value: data[index],
-			};
-		});
+		if (Array.isArray(data)) {
+			if (labels.length !== data.length) {
+				throw new Error(`data/labels mismatch`);
+			}
+
+			return labels.map((label, index) => {
+				return {
+					label,
+					value: data[index],
+				};
+			});
+		}
+
+		const resultMap = new Map<string, any>();
+
+		for (const [key, list] of Object.entries(data)) {
+			if (!list || !list.length) {
+				continue;
+			}
+
+			if (labels.length !== list.length) {
+				throw new Error(`data/labels mismatch for item '${key}'`);
+			}
+
+			list.forEach((value, index) => {
+				const label = labels[index];
+				const item = resultMap.get(label) ?? { label };
+				item[key] = value;
+				resultMap.set(label, item);
+			});
+		}
+
+		return [...resultMap.values()];
 	}
 }

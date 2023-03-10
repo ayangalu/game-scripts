@@ -1,0 +1,123 @@
+.color.emphasis {
+	color: #fe3850;
+}
+
+.color.highlight {
+	color: #00fde3;
+}
+
+.color.thought {
+	color: #8e8b7a;
+}
+
+.color.app-text {
+	color: #00b9e3;
+}
+
+.color.app-highlight {
+	color: #fe9000;
+}
+
+.color.credits {
+	color: #bbb682;
+}
+
+.emoji {
+	--height: 39;
+}
+
+.emoji.button.a {
+	--width: 32;
+	background-image: url('emoji/button-a.png');
+}
+
+.emoji.button.b {
+	--width: 32;
+	background-image: url('emoji/button-b.png');
+}
+
+.emoji.button.x {
+	--width: 32;
+	background-image: url('emoji/button-x.png');
+}
+
+.emoji.button.y {
+	--width: 32;
+	background-image: url('emoji/button-y.png');
+}
+
+.emoji.button.l {
+	--width: 36;
+	background-image: url('emoji/button-l.png');
+}
+
+.emoji.button.r {
+	--width: 36;
+	background-image: url('emoji/button-r.png');
+}
+
+.emoji.button.zl {
+	--width: 36;
+	background-image: url('emoji/button-zl.png');
+}
+
+.emoji.button.plus {
+	--width: 30;
+	background-image: url('emoji/button-plus.png');
+}
+
+.emoji.button.minus {
+	--width: 30;
+	background-image: url('emoji/button-minus.png');
+}
+
+.emoji.stick {
+	--width: 48;
+}
+
+.emoji.stick.l.down {
+	background-image: url('emoji/stick-l-down.png');
+}
+
+.emoji.stick.l.up {
+	background-image: url('emoji/stick-l-up.png');
+}
+
+.emoji.stick.l.press {
+	background-image: url('emoji/stick-l-press.png');
+}
+
+.emoji.stick.r.press {
+	background-image: url('emoji/stick-r-press.png');
+}
+
+.emoji.d-pad.down {
+	--width: 36;
+	background-image: url('emoji/d-pad-down.png');
+}
+
+.emoji.switch {
+	--width: 48;
+	background-image: url('emoji/switch.png');
+}
+
+.emoji.settings {
+	--width: 38;
+	background-image: url('emoji/settings.png');
+}
+
+.emoji.arrow {
+	--width: 44;
+}
+
+.emoji.arrow.right {
+	background-image: url('emoji/arrow-right.png');
+}
+
+.emoji.arrow.left {
+	background-image: url('emoji/arrow-left.png');
+}
+
+.emoji.arrow.up {
+	background-image: url('emoji/arrow-up.png');
+}

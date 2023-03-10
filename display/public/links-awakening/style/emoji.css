@@ -1,8 +1,0 @@
-.emoji {
-	display: inline-block;
-	vertical-align: text-bottom;
-	height: var(--inline-height, 1em);
-	width: calc(var(--width) / var(--height) * var(--inline-height, 1em));
-	background-size: cover;
-	filter: drop-shadow(0.02em 0.02em 0.04em hsl(0 0% 0%));
-}

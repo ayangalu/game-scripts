@@ -1,12 +1,11 @@
 import { DataType } from '@nishin/reader';
 
-import type { FormatTree } from '../../parsers/nintendo/message-studio/format.mjs';
-import {
-	colorFormatter,
-	rubyFormatter,
-	variableFormatter,
-	ShiftCode,
-} from '../../parsers/nintendo/message-studio/format.mjs';
+import type { MarkupTag, TransformerTree } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { placeholderTransformer } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { variableTransformer } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { colorTransformer } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { rubyTransformer } from '../../parsers/nintendo/message-studio/format.html.mjs';
+import { ControlCode } from '../../parsers/nintendo/message-studio/msbt.mjs';
 
 const colors = {
 	'6cd2ffff': 'info',
@@ -85,76 +84,76 @@ const emoji2 = {
 	0x3a: 'button-a',
 };
 
-export const shiftFormats: FormatTree = {
-	[ShiftCode.Out]: {
+export const transformers: TransformerTree = {
+	[ControlCode.Begin]: {
 		0x0000: {
-			0x0000: rubyFormatter(),
-			0x0003: colorFormatter<string>({
+			0x0000: rubyTransformer(),
+			0x0003: colorTransformer<string>({
 				colors,
 				reset: ['edededff', '000000ff'],
 				lookup: ({ buffer }) => buffer.toString('hex'),
 			}),
-			0x0004: ({ openMarkupTags }) => {
-				if (openMarkupTags.find((selector) => selector === 'ul')) {
-					let markup = '';
+			0x0004: ({ state: { openTags } }) => {
+				if (openTags.find(({ name }) => name === 'ul')) {
+					const tokens: Array<string | MarkupTag> = [];
 
-					if (openMarkupTags[0] === 'li') {
-						openMarkupTags.shift();
-						markup += `</li>`;
+					if (openTags[0].name === 'li') {
+						openTags.shift();
+						tokens.push({ name: 'li', type: 'closing' });
 					}
 
-					openMarkupTags.unshift(`li`);
-					return markup + `<li>`;
+					openTags.unshift({ name: 'li', type: 'opening' });
+					tokens.push(openTags[0]);
+					return tokens;
 				}
 
-				return '\n';
+				return '\n\n';
 			},
 		},
 		0x0001: {
-			0x0000: variableFormatter(
-				1,
-				emoji1,
-				(option) => `<debug-token>1:0:${option}</debug-token>`,
-				(icon) => `<span class="emoji ${icon}"></span>`,
-			),
-			0x0001: variableFormatter(
-				1,
-				emoji2,
-				(option) => `<debug-token>1:1:${option}</debug-token>`,
-				(icon) => `<span class="emoji ${icon}"></span>`,
-			),
-			0x0002: ({ parameters }) => {
-				const index = parameters.next(DataType.Uint8);
-				return String.fromCodePoint(0x2460 + index);
-			},
-			0x0003: () => `<player-name character="tloz:link"></player-name>`,
-			0x0007: ({ openMarkupTags, reader }) => {
-				let markup = `<hr><ul>`;
+			0x0000: variableTransformer(1, emoji1, (icon) => [
+				{ name: 'span', type: 'opening', classList: ['emoji', icon] },
+				{ name: 'span', type: 'closing' },
+			]),
+			0x0001: variableTransformer(1, emoji2, (icon) => [
+				{ name: 'span', type: 'opening', classList: ['emoji', icon] },
+				{ name: 'span', type: 'closing' },
+			]),
+			0x0002: placeholderTransformer((payload) => `${payload.next(DataType.Uint8)}`),
+			0x0003: () => [
+				{ name: 'player-name', type: 'opening', attribute: { character: 'tloz:link' } },
+				{ name: 'player-name', type: 'closing' },
+			],
+			0x0007: ({ reader, state: { openTags } }) => {
+				openTags.unshift({ name: 'ul', type: 'opening' });
 
-				openMarkupTags.unshift('ul');
+				const tokens: Array<string | MarkupTag> = [openTags[0]];
 
 				const lastOffset = reader.offset;
 
 				if (reader.next(DataType.Uint8) === 0x0a) {
-					markup += `<li>`;
-					openMarkupTags.unshift('li');
+					openTags.unshift({ name: 'li', type: 'opening' });
+					tokens.push(openTags[0]);
 				} else {
 					reader.seek(lastOffset);
 				}
 
-				return markup;
+				return tokens;
 			},
-			0x000a: () => `<span class="placeholder">＃</span>`,
-			0x0012: ({ parameters, encoding }) => {
-				const count = parameters.next(DataType.Uint16);
-				return parameters.slice(count).next(DataType.string(encoding));
+			0x000a: placeholderTransformer('#'),
+			0x0012: ({ part: { payload }, encoding }) => {
+				const byteLength = payload.next(DataType.Uint16);
+				return payload.next(DataType.string(encoding, { byteLength }));
 			},
-			0x0013: ({ parameters, encoding }) => {
-				const moeumCount = parameters.next(DataType.Uint16);
-				const moeum = parameters.slice(moeumCount).next(DataType.string(encoding));
-				const batchimCount = parameters.next(DataType.Uint16);
-				const batchim = parameters.slice(batchimCount).next(DataType.string(encoding));
-				return `<ko-josa moeum="${moeum}" batchim="${batchim}"></ko-josa>`;
+			0x0013: ({ part: { payload }, encoding }) => {
+				const moeumByteLength = payload.next(DataType.Uint16);
+				const moeum = payload.next(DataType.string(encoding, { byteLength: moeumByteLength }));
+				const batchimByteLength = payload.next(DataType.Uint16);
+				const batchim = payload.next(DataType.string(encoding, { byteLength: batchimByteLength }));
+				return [
+					{ name: 'ko-josa', type: 'opening', attribute: { moeum, batchim } },
+					{ name: 'ko-josa', type: 'closing' },
+				];
 			},
 		},
 	},

@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 @customElement('player-name')

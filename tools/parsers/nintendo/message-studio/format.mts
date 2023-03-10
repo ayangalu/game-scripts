@@ -1,189 +1,170 @@
-import type { BinaryReader, Encoding, SafeIntBytes } from '@nishin/reader';
-import { DataType, ReadMode } from '@nishin/reader';
-import { encode as htmlEncode } from 'html-entities';
+import type { BinaryReader, Encoding } from '@nishin/reader';
+import { DataType } from '@nishin/reader';
 
-export const enum ShiftCode {
-	Out = 0xe,
-	In = 0xf,
-}
+import type { ControlSequence, ControlSequenceBegin, ControlSequenceEnd, Message, MessagePart } from './msbt.mjs';
+import { isControlCode } from './msbt.mjs';
+import { ControlCode } from './msbt.mjs';
 
-export function isShiftCode(value: number | undefined): value is ShiftCode {
-	// @ts-expect-error
-	return [0x0e, 0x0f].includes(value);
-}
+type TokenPrimitive = string | number | boolean | bigint | Record<string, unknown>;
 
-export type ShiftOutFormatter = (data: {
-	reader: BinaryReader<Buffer>;
-	encoding: Encoding;
-	parameters: BinaryReader<Buffer>;
-	openMarkupTags: string[];
-	tagFormatters: FormatTree;
-}) => string;
+export type TransformResult<Token extends TokenPrimitive> = string | Token | Array<string | Token>;
 
-export type ShiftInFormatter = (data: {
-	reader: BinaryReader<Buffer>;
-	encoding: Encoding;
-	openMarkupTags: string[];
-	tagFormatters: FormatTree;
-}) => string;
+export type TransformMacro<Token> = (
+	before: ReadonlyArray<string | Token>,
+	after: ReadonlyArray<string | Token>,
+) => Array<string | Token>;
 
-type FormatSubTree<Formatter extends ShiftOutFormatter | ShiftInFormatter> = Partial<{
-	[group: number]: Partial<{
-		[tag: number]: Formatter;
+export type TransformerData<Part extends MessagePart, State extends object> = {
+	readonly reader: BinaryReader<Buffer>;
+	readonly encoding: Encoding;
+	readonly part: Part;
+	readonly state: State;
+};
+
+export type PartTransformer<Part extends MessagePart, Token extends TokenPrimitive, State extends object> = (
+	data: TransformerData<Part, State>,
+) => TransformResult<Token> | TransformMacro<Token>;
+
+export type StringPartTransformer<Token extends TokenPrimitive, State extends object> = PartTransformer<
+	string,
+	Token,
+	State
+>;
+
+export type ControlPartTransformer<
+	Type extends ControlSequence,
+	Token extends TokenPrimitive,
+	State extends object,
+> = PartTransformer<Type, Token, State>;
+
+export type ControlTagTransformerTree<
+	Type extends ControlSequence,
+	Token extends TokenPrimitive,
+	State extends object,
+> = Partial<{
+	readonly [group: number]: Partial<{
+		readonly [tag: number]: ControlPartTransformer<Type, Token, State>;
 	}>;
 }>;
 
-export type FormatTree = Partial<{
-	0x0e: FormatSubTree<ShiftOutFormatter>;
-	0x0f: FormatSubTree<ShiftInFormatter>;
+export type ControlSequenceTransformerTree<Token extends TokenPrimitive, State extends object> = Partial<{
+	readonly 0x0e: ControlTagTransformerTree<ControlSequenceBegin, Token, State>;
+	readonly 0x0f: ControlTagTransformerTree<ControlSequenceEnd, Token, State>;
 }>;
 
-export interface ShiftControl {
-	readonly code: ShiftCode;
-	readonly group: number;
-	readonly tag: number;
-	readonly parameters?: BinaryReader<Buffer>;
-}
+export type MessagePartTransformers<Token extends TokenPrimitive, State extends object = {}> = Partial<{
+	readonly stringPart: StringPartTransformer<Token, State>;
+	readonly controlParts: ControlSequenceTransformerTree<Token, State>;
+}>;
 
-export function processShiftCode(
-	code: ShiftCode,
-	reader: BinaryReader<Buffer>,
-	encoding: Encoding,
-	openMarkupTags: string[],
-	tagFormatters: FormatTree,
-): ShiftControl | string {
-	const control: Mutable<ShiftControl> = {
-		code,
-		group: reader.next(DataType.Uint16),
-		tag: reader.next(DataType.Uint16),
+export function formatMessage<Token extends TokenPrimitive, State extends object>(
+	message: Message,
+	transformers: MessagePartTransformers<Token, State>,
+	finalize: (tokens: Array<string | Token>) => string,
+	state: State,
+): string;
+export function formatMessage<Token extends TokenPrimitive>(
+	message: Message,
+	transformers: MessagePartTransformers<Token>,
+	finalize: (tokens: Array<string | Token>) => string,
+): string;
+export function formatMessage(message: Message, transformers: MessagePartTransformers<string>): string;
+export function formatMessage<Token extends TokenPrimitive, State extends object>(
+	{ reader, encoding }: Message,
+	transformers: MessagePartTransformers<Token, State>,
+	finalize = (tokens: Array<string | Token>) => tokens.filter((token) => typeof token === 'string').join(''),
+	state?: State,
+): string {
+	const type = DataType.char(encoding);
+
+	const resultItems: Array<string | Token | TransformMacro<Token>> = [];
+
+	const addResultItem = (item: TransformResult<Token> | TransformMacro<Token> | undefined) => {
+		if (typeof item === 'undefined') {
+			return;
+		}
+
+		if (Array.isArray(item)) {
+			resultItems.push(...item);
+		} else {
+			resultItems.push(item);
+		}
 	};
 
-	if (code === ShiftCode.Out) {
-		const parameterByteCount = reader.next(DataType.Uint16);
-		control.parameters = reader.slice(parameterByteCount);
-	}
+	let part = '';
+	let char = reader.next(type);
 
-	const format = tagFormatters[code]?.[control.group]?.[control.tag];
+	state = state ?? ({} as State);
 
-	return (
-		format?.({
-			reader,
-			encoding,
-			// @ts-expect-error
-			parameters: control.parameters,
-			openMarkupTags,
-			tagFormatters,
-		}) ?? control
-	);
-}
-
-export function closeMarkup(openSelectors: string[]) {
-	return openSelectors.map((tag) => `</${tag.split('.')[0]}>`).join('');
-}
-
-export function hex(value: number, length?: number) {
-	const x = value.toString(16);
-
-	if (typeof length === 'number') {
-		return `0x${x.padStart(length, '0')}`;
-	}
-
-	const nextPower = Math.pow(2, Math.ceil(Math.log2(x.length)));
-
-	return `0x${x.padStart(nextPower === 1 ? 2 : nextPower, '0')}`;
-}
-
-export function rubyFormatter(): ShiftOutFormatter {
-	return ({ reader, encoding, parameters }) => {
-		const byteCountBase = parameters.next(DataType.Uint16);
-		const byteCountRuby = parameters.next(DataType.Uint16);
-
-		const rubyText = parameters.next(DataType.string(encoding), ReadMode.Source);
-
-		if (rubyText.source.byteLength !== byteCountRuby) {
-			throw new Error(`ruby text byte count mismatch`);
-		}
-
-		let baseBytesRead = 0;
-		let base = '';
-
-		while (baseBytesRead < byteCountBase) {
-			const char = reader.next(DataType.char(encoding), ReadMode.Source);
-			base += htmlEncode(char.value);
-			baseBytesRead += char.source.byteLength;
-		}
-
-		if (baseBytesRead !== byteCountBase) {
-			throw new Error(`ruby base byte count mismatch`);
-		}
-
-		return `<ruby>${base}<rt>${htmlEncode(rubyText.value)}</rt></ruby>`;
-	};
-}
-
-export function colorFormatter<T extends string | number>({
-	colors,
-	lookup,
-	reset,
-}: {
-	colors: Partial<Record<T, string>>;
-	lookup: (reader: BinaryReader<Buffer>) => T;
-	reset: T[];
-}): ShiftOutFormatter {
-	return ({ parameters, openMarkupTags }) => {
-		const option = lookup(parameters);
-
-		let markup = '';
-
-		const [lastTag, ...lastClassList] = openMarkupTags[0]?.split('.') ?? [];
-
-		if (lastTag === 'span' && lastClassList.includes('color')) {
-			openMarkupTags.shift();
-			markup += `</span>`;
-		}
-
-		if (reset.includes(option)) {
-			return markup;
-		}
-
-		const classList = [
-			'color',
-			colors[option] ?? ['unknown', typeof option === 'number' ? hex(option, 4) : option],
-		].flat();
-
-		openMarkupTags.unshift(`span.${classList.join('.')}`);
-
-		return markup + `<span class="${classList.join(' ')}">`;
-	};
-}
-
-export function variableFormatter<T>(
-	byteLength: SafeIntBytes,
-	variables: Partial<Record<number, T>>,
-	unknown: (option: number) => string,
-	template = (variable: T) => `${variable}`,
-): ShiftOutFormatter {
-	return ({ parameters }) => {
-		const option = parameters.next(DataType.int({ signed: false, byteLength }));
-		if (typeof variables[option] !== 'undefined') {
-			return template(variables[option]!);
-		}
-		return unknown(option);
-	};
-}
-
-export function capitalizationFormatter(): ShiftOutFormatter {
-	return ({ reader, encoding, openMarkupTags, tagFormatters }) => {
-		let char = reader.next(DataType.char(encoding));
+	while (char !== '\0') {
 		const code = char.codePointAt(0);
 
-		if (isShiftCode(code)) {
-			const result = processShiftCode(code, reader, encoding, openMarkupTags, tagFormatters);
-			char = typeof result === 'string' ? result : '';
+		if (isControlCode(code)) {
+			if (part) {
+				addResultItem(transformers?.stringPart?.({ reader, encoding, part, state }) ?? part);
+				part = '';
+			}
+
+			const group = reader.next(DataType.Uint16);
+			const tag = reader.next(DataType.Uint16);
+
+			if (code === ControlCode.Begin) {
+				const payloadByteLength = reader.next(DataType.Uint16);
+				const payload = reader.slice(payloadByteLength);
+
+				addResultItem(
+					transformers.controlParts?.[0x0e]?.[group]?.[tag]?.({
+						reader,
+						encoding,
+						part: { code, group, tag, payload },
+						state,
+					}),
+				);
+			} else {
+				addResultItem(
+					transformers.controlParts?.[0x0f]?.[group]?.[tag]?.({
+						reader,
+						encoding,
+						part: { code, group, tag },
+						state,
+					}),
+				);
+			}
 		} else {
-			char = htmlEncode(char);
+			part += char;
 		}
 
-		return `<span class="capitalize">${char}</span>`;
-	};
+		char = reader.next(type);
+	}
+
+	if (part) {
+		addResultItem(transformers?.stringPart?.({ reader, encoding, part, state }) ?? part);
+	}
+
+	let beforeMacro: Array<string | Token> = [];
+	let afterMacro: Array<string | Token> = [];
+	let macro: TransformMacro<Token> | undefined;
+
+	for (const item of resultItems) {
+		if (typeof item === 'function') {
+			if (macro) {
+				beforeMacro = macro(beforeMacro, afterMacro);
+				afterMacro = [];
+			}
+
+			macro = item;
+		} else {
+			if (macro) {
+				afterMacro.push(item);
+			} else {
+				beforeMacro.push(item);
+			}
+		}
+	}
+
+	if (macro) {
+		return finalize(macro(beforeMacro, afterMacro));
+	}
+
+	return finalize(beforeMacro);
 }

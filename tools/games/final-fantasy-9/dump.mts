@@ -81,7 +81,7 @@ const transformers: Partial<Record<string, Transformer>> = {
 	'A85038': colorStart('brown'),
 	'383838': ({ openMarkupTags }) => closeHTML(openMarkupTags),
 	'C8C8C8': ({ openMarkupTags }) => closeHTML(openMarkupTags),
-	'CARD': () => `<span class="placeholder">＃</span>`,
+	'CARD': () => `<span class="placeholder">#</span>`,
 	'ZDNE': () => `<player-name character="ff9:zidane"></player-name>`,
 	'VIVI': () => `<player-name character="ff9:vivi"></player-name>`,
 	'DGGR': () => `<player-name character="ff9:dagger"></player-name>`,
@@ -90,10 +90,10 @@ const transformers: Partial<Record<string, Transformer>> = {
 	'QUIN': () => `<player-name character="ff9:quina"></player-name>`,
 	'EIKO': () => `<player-name character="ff9:eiko"></player-name>`,
 	'AMRT': () => `<player-name character="ff9:amarant"></player-name>`,
-	'PTY1': () => `<span class="placeholder">①</span>`,
-	'PTY2': () => `<span class="placeholder">②</span>`,
-	'PTY3': () => `<span class="placeholder">③</span>`,
-	'PTY4': () => `<span class="placeholder">④</span>`,
+	'PTY1': () => `<span class="placeholder">1</span>`,
+	'PTY2': () => `<span class="placeholder">2</span>`,
+	'PTY3': () => `<span class="placeholder">3</span>`,
+	'PTY4': () => `<span class="placeholder">4</span>`,
 	'DBTN': ({ locale, parameters: [id] }) => `<span class="controller ${buttonLookup('joy', id, locale)[0]}"></span>`,
 	'CBTN': ({ locale, parameters: [id] }) => `<span class="controller ${buttonLookup('joy', id, locale)[0]}"></span>`,
 	'JCBT': ({ locale, parameters: [id] }) => `<span class="controller ${buttonLookup('joy', id, locale)[0]}"></span>`,
@@ -102,9 +102,9 @@ const transformers: Partial<Record<string, Transformer>> = {
 		return `<span class="keyboard ${style}">${content}</span>`;
 	},
 	'MOVE': () => `\t`,
-	'TEXT': ({ parameters: [_, id] }) => `<span class="placeholder">${String.fromCodePoint(0x2460 + parseInt(id))}</span>`,
-	'ITEM': ({ parameters: [id] }) => `<span class="placeholder">${String.fromCodePoint(0x2460 + parseInt(id))}</span>`,
-	'NUMB': () => `<span class="placeholder">＃</span>`,
+	'TEXT': ({ parameters: [_, id] }) => `<span class="placeholder">${id}</span>`,
+	'ITEM': ({ parameters: [id] }) => `<span class="placeholder">${id}</span>`,
+	'NUMB': () => `<span class="placeholder">#</span>`,
 	'ICON': ({ locale, parameters: [id] }) => {
 		switch (id) {
 			case '34':

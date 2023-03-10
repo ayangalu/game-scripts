@@ -4,8 +4,9 @@ import path from 'node:path';
 import { merge } from 'lodash-es';
 
 import { HtmlTools } from '../../html-tools.mjs';
+import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
-import { shiftFormats } from './data.mjs';
+import { transformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('links-awakening');
 
@@ -18,14 +19,18 @@ try {
 		return readdirSync(languageRoot).reduce<NRecord<string, string, 3>>((result, filename) => {
 			if (filename.endsWith('.msbt')) {
 				const decodedEntries = result[filename] ?? {};
-				const msbt = new MSBT(path.join(languageRoot, filename), shiftFormats);
+				const msbt = new MSBT(path.join(languageRoot, filename));
 
 				for (const entry of msbt.entries) {
-					if (!htmlTools.cache.includes(entry.value)) {
-						const report = htmlTools.validate(entry.value);
+					console.log(`${locale} ${filename} ${entry.label}`);
+
+					const markup = formatMessage(entry.message, {}, transformers);
+
+					if (!htmlTools.cache.includes(markup)) {
+						const report = htmlTools.validate(markup);
 
 						if (report.valid) {
-							htmlTools.cache.push(entry.value);
+							htmlTools.cache.push(markup);
 						} else {
 							console.log(`ERROR: ${locale} ${filename} ${entry.label}`);
 							htmlTools.persistCache();
@@ -34,10 +39,8 @@ try {
 					}
 
 					decodedEntries[entry.label] = {
-						[locale]: entry.value,
+						[locale]: markup,
 					};
-
-					console.log(`${sourceRoot} ${locale} ${filename} ${entry.label}`);
 				}
 
 				result[filename] = decodedEntries;

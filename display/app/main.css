@@ -181,8 +181,10 @@ pre {
 	font-family: inherit;
 }
 
-pre ruby {
-	white-space: normal;
+@supports (-moz-appearance: none) {
+	pre ruby {
+		white-space: normal;
+	}
 }
 
 td hr {
@@ -207,4 +209,23 @@ td.dim > pre {
 
 td.dim > pre.blur {
 	filter: blur(5px);
+}
+
+.emoji {
+	display: inline-block;
+	vertical-align: text-bottom;
+	height: var(--inline-height, 1em);
+	width: calc(var(--width) / var(--height) * var(--inline-height, 1em));
+	background-size: cover;
+	filter: drop-shadow(0.02em 0.02em 0.04em hsl(0 0% 0%));
+}
+
+.placeholder {
+	user-select: none;
+	font-family: var(--sl-font-mono);
+	font-size: 75%;
+	vertical-align: text-bottom;
+	background-color: var(--slategrey-darker-15);
+	padding: 0.2em 0.4em;
+	border-radius: var(--sl-border-radius-small);
 }

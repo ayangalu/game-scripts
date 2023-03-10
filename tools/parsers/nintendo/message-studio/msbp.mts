@@ -18,7 +18,7 @@ interface TagGroup {
 
 interface Tag {
 	name: string;
-	parameters: number[];
+	payload: number[];
 }
 
 interface TagParameter {
@@ -58,7 +58,7 @@ export class MSBP extends LMS<Blocks> {
 	get attributes() {
 		return this.mapLabels(
 			this.blocks.ALB1,
-			(this.blocks.ATI2 ?? []).map(({ type, index, offset }) => {
+			this.blocks.ATI2?.map(({ type, index, offset }) => {
 				const listItems = this.blocks.ALI2?.[index];
 
 				if (!listItems) {
@@ -91,7 +91,7 @@ export class MSBP extends LMS<Blocks> {
 
 					return {
 						name: tag.name,
-						parameters: tag.parameters.map((parameterIndex) => {
+						payload: tag.payload.map((parameterIndex) => {
 							const parameter = this.blocks.TGP2?.[parameterIndex];
 
 							if (!parameter) {
@@ -166,9 +166,9 @@ export class MSBP extends LMS<Blocks> {
 				reader.skip(2);
 				return repeat(count, () => reader.next(DataType.Uint32)).map((offset) => {
 					reader.seek(offset);
-					const parameters = repeat(reader.next(DataType.Uint16), () => reader.next(DataType.Uint16));
+					const payload = repeat(reader.next(DataType.Uint16), () => reader.next(DataType.Uint16));
 					const name = reader.next(DataType.string(Encoding.ASCII));
-					return { name, parameters };
+					return { name, payload };
 				});
 			},
 			TGP2: (reader) => {

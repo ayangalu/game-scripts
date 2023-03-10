@@ -17,12 +17,12 @@
 	},
 	"devDependencies": {
 		"@inspector-hex/decoder-api": "0.3.6",
-		"@nishin/node-file-reader": "0.4.1",
-		"@nishin/reader": "0.4.1",
+		"@nishin/node-file-reader": "0.5.0",
+		"@nishin/reader": "0.5.1",
 		"@tswt/dedicated-worker": "0.0.1-alpha.10",
 		"@tswt/window": "0.0.1-alpha.10",
 		"@types/lodash-es": "4.17.6",
-		"@types/node": "18.11.18",
+		"@types/node": "18.14.1",
 		"@typescript-eslint/eslint-plugin": "5.48.0",
 		"@typescript-eslint/parser": "5.48.0",
 		"csv": "6.2.2",
@@ -36,12 +36,13 @@
 		"lodash-es": "4.17.21",
 		"log-update": "5.0.1",
 		"observable-fns": "0.6.1",
-		"prettier": "2.8.2",
+		"prettier": "2.8.4",
 		"threads": "1.7.0",
 		"tree-sitter": "0.20.1",
 		"tree-sitter-c-sharp": "0.20.0",
-		"tsx": "3.12.1",
-		"typescript": "4.9.4",
+		"ts-toolbelt": "9.6.0",
+		"tsx": "3.12.3",
+		"typescript": "4.9.5",
 		"vite": "3.2.4"
 	}
 }

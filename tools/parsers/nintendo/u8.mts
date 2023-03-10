@@ -60,11 +60,11 @@ export class U8 {
 
 		reader.assertMagic(Buffer.from([0x55, 0xaa, 0x38, 0x2d]));
 
-		const startOffset = reader.next(DataType.Uint32).value;
+		const startOffset = reader.next(DataType.Uint32);
 
 		reader.seek(startOffset + 8);
 
-		const nodeCount = reader.next(DataType.Uint32).value;
+		const nodeCount = reader.next(DataType.Uint32);
 
 		const nodeSize = 12;
 		const directoryStack: Directory[] = [];
@@ -74,16 +74,16 @@ export class U8 {
 
 			reader.seek(startOffset + index * nodeSize);
 
-			const isDirectory = reader.next(DataType.Boolean).value;
+			const isDirectory = reader.next(DataType.Boolean);
 
 			reader.skip(1);
 
-			const nameOffset = reader.next(DataType.Uint16).value;
-			const info = reader.next(DataType.array(DataType.Uint32, 2)).value;
+			const nameOffset = reader.next(DataType.Uint16);
+			const info = reader.next(DataType.array(DataType.Uint32, 2));
 
 			reader.seek(startOffset + nodeCount * nodeSize + nameOffset);
 
-			const name = reader.next(DataType.string(Encoding.ASCII)).value;
+			const name = reader.next(DataType.string(Encoding.ASCII));
 
 			const shiftIndex = directoryStack[0]?.shiftIndex ?? nodeCount;
 

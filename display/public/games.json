@@ -7,7 +7,7 @@
 					"*": null
 				}
 			},
-			"locales": ["de-DE", "en-GB", "ja-JP"],
+			"locales": ["de-DE", "en-GB", "en-US", "es-ES", "es-US", "fr-FR", "fr-US", "it-IT", "ja-JP"],
 			"ruby": ["ja-JP"],
 			"characters": {
 				"tloz:link": {
@@ -18,6 +18,31 @@
 		}
 	},
 	"Switch": {
+		"Breath of the Wild": {
+			"root": "breath-of-the-wild",
+			"messageFormat": {
+				"*": {
+					"*": null
+				}
+			},
+			"locales": [
+				"de-DE",
+				"en-GB",
+				"en-US",
+				"es-ES",
+				"es-US",
+				"fr-FR",
+				"fr-US",
+				"it-IT",
+				"ja-JP",
+				"ko-KR",
+				"nl-NL",
+				"ru-RU",
+				"zh-CN",
+				"zh-TW"
+			],
+			"ruby": ["ja-JP"]
+		},
 		"Skyward Sword HD": {
 			"root": "skyward-sword-hd",
 			"messageFormat": {

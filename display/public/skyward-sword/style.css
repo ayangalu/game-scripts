@@ -1,6 +1,4 @@
-@import url('style/common.css');
 @import url('style/color.css');
-@import url('style/emoji.css');
 
 .emoji {
 	--height: 39;
