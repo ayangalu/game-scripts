@@ -23,6 +23,10 @@ const messages$ = combineLatest([path$, gameData$]).pipe(
 		// skip platform and game title
 		for (const { label } of path.slice(2)) {
 			data = data[label] as MessageData;
+
+			if (!data) {
+				return {};
+			}
 		}
 
 		return data as unknown as MessageDict;
