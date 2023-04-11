@@ -5,6 +5,7 @@ import type { Message } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+import { Skeleton } from '../../skeleton.mjs';
 import { transformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('breath-of-the-wild');
@@ -13,9 +14,11 @@ const sourceRoot = `data/breath-of-the-wild/messages`;
 const targetRoot = `display/public/breath-of-the-wild`;
 
 try {
-	const result: NRecord<string, string, 4> = {};
+	const dataDir = path.join(targetRoot, 'data');
+	const skeleton = new Skeleton(dataDir);
 
 	for (const locale of readdirSync(sourceRoot)) {
+		const result: NRecord<string, string, 4> = {};
 		const languageRoot = path.join(sourceRoot, locale);
 
 		for (const folderName of readdirSync(languageRoot)) {
@@ -64,9 +67,12 @@ try {
 				}
 			}
 		}
+
+		skeleton.update(result);
+		writeFileSync(path.join(dataDir, `${locale}.json`), JSON.stringify(result));
 	}
 
-	writeFileSync(path.join(targetRoot, 'message.json'), JSON.stringify(result));
+	skeleton.persist();
 } finally {
 	htmlTools.persistCache();
 }

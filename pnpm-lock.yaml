@@ -4,6 +4,7 @@ specifiers:
   '@inspector-hex/decoder-api': 0.3.6
   '@nishin/node-file-reader': 0.5.0
   '@nishin/reader': 0.5.1
+  '@shigen/merge': 0.1.0
   '@shoelace-style/shoelace': 2.0.0-beta.86
   '@tswt/dedicated-worker': 0.0.1-alpha.10
   '@tswt/window': 0.0.1-alpha.10
@@ -48,6 +49,7 @@ devDependencies:
   '@inspector-hex/decoder-api': 0.3.6
   '@nishin/node-file-reader': 0.5.0
   '@nishin/reader': 0.5.1
+  '@shigen/merge': 0.1.0
   '@tswt/dedicated-worker': 0.0.1-alpha.10
   '@tswt/window': 0.0.1-alpha.10
   '@types/lodash-es': 4.17.6
@@ -435,6 +437,10 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
+    dev: true
+
+  /@shigen/merge/0.1.0:
+    resolution: {integrity: sha512-xO0IYvpK4pMLNcyYVb0m91aFVv1k3gCxb7ikIGkigD1xGCy/8syUafbWjTl2MqQLntYvLi8imupm0EyxQKmoJA==}
     dev: true
 
   /@shoelace-style/animations/1.1.0:

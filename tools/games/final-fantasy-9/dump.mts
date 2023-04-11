@@ -1,12 +1,35 @@
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+import { clone, createMerge, isComposite } from '@shigen/merge';
 
 import { HtmlTools } from '../../html-tools.mjs';
+import { Skeleton } from '../../skeleton.mjs';
 import { iconMap } from './assembly-data.mjs';
-import { aligned } from './load-messages.mjs';
+import { aligned, localeMap } from './load-messages.mjs';
 
 type Transformer = (data: { openMarkupTags: string[]; locale: string; parameters: string[] }) => string;
 
 const htmlTools = new HtmlTools('final-fantasy-9');
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type DeepMergeFunction = typeof import('@shigen/merge').deepMerge;
+
+const merge: DeepMergeFunction = createMerge<DeepMergeFunction>({
+	visit: ({ values: [target, source] }) => {
+		if (isComposite(source) && Object.values(source).every((value) => typeof value === 'string')) {
+			return {};
+		}
+
+		target ??= Array.isArray(source) ? [] : {};
+
+		if (isComposite(target) && isComposite(source)) {
+			return merge(target, source);
+		}
+
+		return clone(target, source);
+	},
+});
 
 const buttonLookup = (type: 'joy' | 'key', id: string, locale = 'ja-JP') => {
 	switch (id) {
@@ -166,86 +189,86 @@ function mapEntries<T, U>(source: Record<string, T>, callback: (value: T, key: s
 	return Object.fromEntries(Object.entries(source).map(([key, value]) => [key, callback(value, key)]));
 }
 
-const messages = {
-	'localization.txt': mapEntries(aligned.system.system, (entries, name) => {
-		console.log(`manifest/text/localization.txt/${name}`);
-		return mapEntries(entries, (message, locale) => {
-			return transform(message, locale);
-		});
-	}),
-	'field': mapEntries(aligned.field, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`field/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'item': mapEntries(aligned.item, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`item/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'keyitem': mapEntries(aligned.keyitem, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`keyitem/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'ability': mapEntries(aligned.ability, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`ability/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'command': mapEntries(aligned.command, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`command/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'battle': mapEntries(aligned.battle, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`battle/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
-			});
-		});
-	}),
-	'location': {
-		'loc_name.mes': mapEntries(aligned.location['loc_name.mes'], (entries, index) => {
-			console.log(`location/log_name.mes #${index}`);
-			return mapEntries(entries, (message, locale) => {
-				return transform(message, locale);
+function extractLocale(locale: string, entry: Partial<Record<string, string>>) {
+	const message = entry[locale];
+
+	if (!message) {
+		return {};
+	}
+
+	return {
+		[locale]: transform(message, locale),
+	};
+}
+
+const dataDir = `display/public/final-fantasy-9/data`;
+const skeleton = new Skeleton(dataDir);
+
+for (const locale of Object.values(localeMap)) {
+	const messages = {
+		'localization.txt': mapEntries(aligned.system.system, (entries, name) => {
+			console.log(locale, `manifest/text/localization.txt/${name}`);
+			return extractLocale(locale, entries);
+		}),
+		'field': mapEntries(aligned.field, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `field/${file} #${index}`);
+				return extractLocale(locale, entry);
 			});
 		}),
-	},
-	'etc': mapEntries(aligned.etc, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`etc/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
+		'item': mapEntries(aligned.item, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `item/${file} #${index}`);
+				return extractLocale(locale, entry);
 			});
-		});
-	}),
-	'title': mapEntries(aligned.title, (entries, file) => {
-		return entries.map((entry, index) => {
-			console.log(`title/${file} #${index}`);
-			return mapEntries(entry, (message, locale) => {
-				return transform(message, locale);
+		}),
+		'keyitem': mapEntries(aligned.keyitem, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `keyitem/${file} #${index}`);
+				return extractLocale(locale, entry);
 			});
-		});
-	}),
-};
+		}),
+		'ability': mapEntries(aligned.ability, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `ability/${file} #${index}`);
+				return extractLocale(locale, entry);
+			});
+		}),
+		'command': mapEntries(aligned.command, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `command/${file} #${index}`);
+				return extractLocale(locale, entry);
+			});
+		}),
+		'battle': mapEntries(aligned.battle, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `battle/${file} #${index}`);
+				return extractLocale(locale, entry);
+			});
+		}),
+		'location': {
+			'loc_name.mes': mapEntries(aligned.location['loc_name.mes'], (entries, index) => {
+				console.log(locale, `location/log_name.mes #${index}`);
+				return extractLocale(locale, entries);
+			}),
+		},
+		'etc': mapEntries(aligned.etc, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `etc/${file} #${index}`);
+				return extractLocale(locale, entry);
+			});
+		}),
+		'title': mapEntries(aligned.title, (entries, file) => {
+			return entries.map((entry, index) => {
+				console.log(locale, `title/${file} #${index}`);
+				return extractLocale(locale, entry);
+			});
+		}),
+	};
 
+	skeleton.update(messages);
+	writeFileSync(path.join(dataDir, `${locale}.json`), JSON.stringify(messages));
+}
+
+skeleton.persist();
 htmlTools.persistCache();
-writeFileSync(`display/public/final-fantasy-9/message.json`, JSON.stringify(messages));

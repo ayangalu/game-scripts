@@ -40,7 +40,7 @@ export const raw = readdirSync(textRoot).reduce<NRecord<string, string, 3>>((res
 	return result;
 }, Object.create(null));
 
-const localeMap: Record<string, string> = {
+export const localeMap: Record<string, string> = {
 	es: 'es-ES',
 	fr: 'fr-FR',
 	gr: 'de-DE',

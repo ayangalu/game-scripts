@@ -1,11 +1,10 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { merge } from 'lodash-es';
-
 import { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
+import { Skeleton } from '../../skeleton.mjs';
 import { transformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('links-awakening');
@@ -14,9 +13,14 @@ const sourceRoot = `data/links-awakening/messages`;
 const targetRoot = `display/public/links-awakening`;
 
 try {
-	const messages = readdirSync(sourceRoot).map((locale) => {
+	const dataDir = path.join(targetRoot, 'data');
+	const skeleton = new Skeleton(dataDir);
+
+	for (const locale of readdirSync(sourceRoot)) {
+		const result: NRecord<string, string, 3> = {};
 		const languageRoot = path.join(sourceRoot, locale);
-		return readdirSync(languageRoot).reduce<NRecord<string, string, 3>>((result, filename) => {
+
+		for (const filename of readdirSync(languageRoot)) {
 			if (filename.endsWith('.msbt')) {
 				const decodedEntries = result[filename] ?? {};
 				const msbt = new MSBT(path.join(languageRoot, filename));
@@ -45,12 +49,13 @@ try {
 
 				result[filename] = decodedEntries;
 			}
+		}
 
-			return result;
-		}, {});
-	});
+		skeleton.update(result);
+		writeFileSync(path.join(dataDir, `${locale}.json`), JSON.stringify(result));
+	}
 
-	writeFileSync(path.join(targetRoot, 'message.json'), JSON.stringify(merge({}, ...messages)));
+	skeleton.persist();
 } finally {
 	htmlTools.persistCache();
 }
