@@ -2,6 +2,7 @@ import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { DataType } from '@nishin/reader';
+import { z } from 'zod';
 
 import type {
 	BeginTransformer,
@@ -20,6 +21,7 @@ import {
 } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { ControlCode, MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { U8 } from '../../parsers/nintendo/u8.mjs';
+import url from '../../url.mjs';
 
 const commonEmoji = {
 	0x00: ['button-a'],
@@ -44,7 +46,7 @@ const commonEmoji = {
 };
 
 const emoji = {
-	'skyward-sword': {
+	wii: {
 		...commonEmoji,
 		0x07: ['button-z'],
 		0x08: ['stick', 'center'],
@@ -55,7 +57,7 @@ const emoji = {
 		0x0d: ['stick', 'axis', 'y'],
 		0x0e: ['stick', 'axis', 'x'],
 	},
-	'skyward-sword-hd': {
+	switch: {
 		...commonEmoji,
 		0x07: ['button-zl'],
 		0x08: ['stick', 'l', 'center'],
@@ -232,7 +234,7 @@ function choiceTransformer(index: number): BeginTransformer<{}> {
 	};
 }
 
-function buildTransformers(version: 'skyward-sword' | 'skyward-sword-hd') {
+export function buildTransformers(root: URL) {
 	const minimalTransformers = {
 		[ControlCode.Begin]: {
 			0x0000: {
@@ -241,10 +243,10 @@ function buildTransformers(version: 'skyward-sword' | 'skyward-sword-hd') {
 		},
 	};
 
-	const root = path.join('data', version, 'messages');
+	const platform = z.union([z.literal('switch'), z.literal('wii')]).parse(root.pathname.match(/switch|wii/u)?.[0]);
 
 	const archives = readdirSync(root).map((locale) => {
-		return [locale, new U8(path.join(root, locale, '0-Common.arc'))] as const;
+		return [locale, new U8(url.join(root, locale, '0-Common.arc'))] as const;
 	});
 
 	const itemMap = archives.reduce<Record<string, Record<number, string>>>((resultMap, [locale, u8]) => {
@@ -332,7 +334,7 @@ function buildTransformers(version: 'skyward-sword' | 'skyward-sword-hd') {
 						return hex(index, 4);
 					}),
 					0x0003: placeholderTransformer('#'),
-					0x0004: variableTransformer(1, emoji[version], (classes) => [
+					0x0004: variableTransformer(1, emoji[platform], (classes) => [
 						{ name: 'span', type: 'opening', classList: ['emoji', ...classes] },
 						{ name: 'span', type: 'closing' },
 					]),
@@ -367,8 +369,3 @@ function buildTransformers(version: 'skyward-sword' | 'skyward-sword-hd') {
 		};
 	};
 }
-
-export const data = {
-	wii: buildTransformers('skyward-sword'),
-	switch: buildTransformers('skyward-sword-hd'),
-};

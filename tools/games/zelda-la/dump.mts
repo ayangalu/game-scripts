@@ -5,11 +5,12 @@ import { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { Skeleton } from '../../skeleton.mjs';
+import url from '../../url.mjs';
 import { transformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('links-awakening');
 
-const sourceRoot = `data/links-awakening/messages`;
+const sourceRoot = new URL(`./source/switch/messages`, import.meta.url);
 const targetRoot = `display/public/links-awakening`;
 
 try {
@@ -18,12 +19,12 @@ try {
 
 	for (const locale of readdirSync(sourceRoot)) {
 		const result: NRecord<string, string, 3> = {};
-		const languageRoot = path.join(sourceRoot, locale);
+		const languageRoot = url.join(sourceRoot, locale);
 
 		for (const filename of readdirSync(languageRoot)) {
 			if (filename.endsWith('.msbt')) {
 				const decodedEntries = result[filename] ?? {};
-				const msbt = new MSBT(path.join(languageRoot, filename));
+				const msbt = new MSBT(url.join(languageRoot, filename));
 
 				for (const entry of msbt.entries) {
 					console.log(`${locale} ${filename} ${entry.label}`);

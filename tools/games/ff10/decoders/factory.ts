@@ -27,7 +27,7 @@ function safeFindIndex<T>(
 
 export const decoderFactory = (locale: FFXLocale, fileTable: FileTable = {}): Decoder => {
 	const commonTable = readFileSync(
-		`data/final-fantasy-10-hd/extract/ffx_ps2/ffx/master/jppc/ffx_encoding/ffxsjistbl_${locale}.bin`,
+		`tools/games/ff10/source/pc/ffx_ps2/ffx/master/jppc/ffx_encoding/ffxsjistbl_${locale}.bin`,
 		'utf-8',
 	);
 

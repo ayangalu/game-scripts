@@ -122,7 +122,7 @@ export class MSBP extends LMS<Blocks> {
 		return this.mapLabels(this.blocks.SLB1, this.blocks.SYL3);
 	}
 
-	constructor(source: string | Buffer) {
+	constructor(source: string | URL | Buffer) {
 		super(source, 'MsgPrjBn', [4], {
 			CLR1: (reader) => {
 				return repeat(reader.next(DataType.Uint32), () => {

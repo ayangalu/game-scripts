@@ -6,7 +6,10 @@ import { hex } from '../../format.mjs';
 import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 
-const sources = readMSBT(`data/breath-of-the-wild/messages` /* , (path) => path.includes('en-US') */);
+const sources = readMSBT(
+	new URL(`./source/switch/messages`, import.meta.url) /* , ({ pathname }) =>
+	pathname.includes('en-US'), */,
+);
 
 const placeholderSymbol = (payload: BinaryReader<Buffer>) => {
 	const value = payload.next(DataType.Uint16);

@@ -1,6 +1,7 @@
 import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect.mjs';
 
-const msbts = readMSBT(`data/${process.argv[2]}${process.argv[3] ?? ''}/messages`);
+const root = new URL(`./source/${process.argv[3]}/messages`, import.meta.url);
+const msbts = readMSBT(root);
 
 const result = controlCodes(msbts, {
 	ignore: {

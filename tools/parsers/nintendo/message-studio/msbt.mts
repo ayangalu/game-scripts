@@ -58,7 +58,7 @@ export class MSBT extends LMS<Blocks> {
 		});
 	}
 
-	constructor(source: string | Buffer) {
+	constructor(source: string | URL | Buffer) {
 		super(source, 'MsgStdBn', [3], {
 			LBL1: processLabelBlock,
 			TSY1: (reader) => {

@@ -6,11 +6,12 @@ import { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { Skeleton } from '../../skeleton.mjs';
+import url from '../../url.mjs';
 import { transformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('breath-of-the-wild');
 
-const sourceRoot = `data/breath-of-the-wild/messages`;
+const sourceRoot = new URL(`./source/switch/messages`, import.meta.url);
 const targetRoot = `display/public/breath-of-the-wild`;
 
 try {
@@ -19,15 +20,15 @@ try {
 
 	for (const locale of readdirSync(sourceRoot)) {
 		const result: NRecord<string, string, 4> = {};
-		const languageRoot = path.join(sourceRoot, locale);
+		const languageRoot = url.join(sourceRoot, locale);
 
 		for (const folderName of readdirSync(languageRoot)) {
-			const msbtRoot = path.join(languageRoot, folderName);
+			const msbtRoot = url.join(languageRoot, folderName);
 
 			for (const fileName of readdirSync(msbtRoot)) {
 				console.log(`${locale} ${folderName} ${fileName}`);
 
-				const msbt = new MSBT(path.join(msbtRoot, fileName));
+				const msbt = new MSBT(url.join(msbtRoot, fileName));
 
 				const format = (message: Message) => {
 					message.reader.seek(0);

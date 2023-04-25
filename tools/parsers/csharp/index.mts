@@ -23,7 +23,7 @@ function fieldDeclaration(name: string, valueExpression: string) {
 export class CSharpFile {
 	private readonly tree: Parser.Tree;
 
-	constructor(file: string) {
+	constructor(file: string | URL) {
 		this.tree = parser.parse(readFileSync(file, 'utf-8'));
 	}
 

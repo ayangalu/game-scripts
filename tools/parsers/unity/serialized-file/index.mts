@@ -6,6 +6,7 @@ import { repeat, BinaryReader, ByteOrder, DataType, Encoding } from '@nishin/rea
 import type { Platform } from '../platform.mjs';
 import type { Asset } from './assets/index.mjs';
 import { ensure } from '../../../ensure.mjs';
+import url from '../../../url.mjs';
 import { AssetType, ResourceManager } from './assets/index.mjs';
 import { TextAsset } from './assets/text-asset.mjs';
 import { SerializedType } from './serialized-type.mjs';
@@ -246,17 +247,17 @@ export class SerializedFile {
 		}
 	}
 
-	extractResources(root: string, filter: (resourcePath: string) => boolean = () => true) {
+	extractResources(root: URL, filter: (resourcePath: string) => boolean = () => true) {
 		this.resources?.forEach((data, resourcePath) => {
 			if (!filter(resourcePath)) {
 				return;
 			}
 
 			const { base, dir } = path.parse(resourcePath);
-			const targetPath = path.join(root, dir);
+			const targetPath = url.join(root, dir);
 
 			mkdirSync(targetPath, { recursive: true });
-			writeFileSync(path.join(targetPath, base), data);
+			writeFileSync(url.join(targetPath, base), data);
 		});
 	}
 }

@@ -2,33 +2,36 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { parse as csvParse } from 'csv-parse/sync';
+import z from 'zod';
 
 import type { Alignment } from './alignments.mjs';
 import { SerializedFile } from '../../parsers/unity/serialized-file/index.mjs';
+import url from '../../url.mjs';
 import { fieldAlignment, ragtimeAlignment, ragtimeFiles } from './alignments.mjs';
 import { eventMessageMap, messageDB, mogIconOpCode, sceneData } from './assembly-data.mjs';
 
-const assetsRoot = `data/final-fantasy-9/extract/embeddedasset`;
-const textRoot = path.join(assetsRoot, 'text');
+const extractRoot = new URL('./source/pc', import.meta.url);
+const assetsRoot = url.join(extractRoot, 'embeddedasset');
+const textRoot = url.join(assetsRoot, 'text');
 
 try {
 	readdirSync(textRoot);
 } catch {
-	new SerializedFile(`data/final-fantasy-9/data/mainData`).extractResources(
-		`data/final-fantasy-9/extract`,
-		(resourcePath) =>
-			resourcePath.startsWith('embeddedasset') && ['', '.txt', '.mes'].includes(path.extname(resourcePath)),
-	);
+	const env = z.object({ FF9_MAIN_DATA: z.string() }).parse(process.env);
+
+	new SerializedFile(env.FF9_MAIN_DATA).extractResources(extractRoot, (resourcePath) => {
+		return resourcePath.startsWith('embeddedasset') && ['', '.txt', '.mes'].includes(path.extname(resourcePath));
+	});
 }
 
 export const raw = readdirSync(textRoot).reduce<NRecord<string, string, 3>>((result, locale) => {
 	const categories: NRecord<string, string, 2> = Object.create(null);
 
-	readdirSync(path.join(textRoot, locale)).forEach((category) => {
+	readdirSync(url.join(textRoot, locale)).forEach((category) => {
 		const messages: Record<string, string> = Object.create(null);
 
-		readdirSync(path.join(textRoot, locale, category)).forEach((file) => {
-			const message = readFileSync(path.join(textRoot, locale, category, file), 'utf-8');
+		readdirSync(url.join(textRoot, locale, category)).forEach((file) => {
+			const message = readFileSync(url.join(textRoot, locale, category, file), 'utf-8');
 			messages[file] = message;
 		});
 
@@ -101,7 +104,7 @@ const battleOrder = [...new Set(Object.values(sceneData))];
 export const aligned = {
 	system: {
 		system: (
-			csvParse(readFileSync(path.join(assetsRoot, 'manifest/text/localization.txt')), {
+			csvParse(readFileSync(url.join(assetsRoot, 'manifest/text/localization.txt')), {
 				skipEmptyLines: true,
 				skipRecordsWithEmptyValues: true,
 				relaxColumnCount: true,

@@ -2,3 +2,5 @@ dist
 message.json
 vite.build-config.json
 *.png
+*.gz
+data/

@@ -11,15 +11,15 @@
 		}
 	},
 	"inspectorHex.customDecoders": {
-		"Final Fantasy X (US)": "./tools/games/final-fantasy-10/decoders/us.decoder.ts",
-		"Final Fantasy X (KR)": "./tools/games/final-fantasy-10/decoders/kr.decoder.ts",
-		"Final Fantasy X (CH)": "./tools/games/final-fantasy-10/decoders/ch.decoder.ts",
-		"Final Fantasy X (JP)": "./tools/games/final-fantasy-10/decoders/jp.decoder.ts"
+		"Final Fantasy X (US)": "./tools/games/ff10/decoders/us.decoder.ts",
+		"Final Fantasy X (KR)": "./tools/games/ff10/decoders/kr.decoder.ts",
+		"Final Fantasy X (CH)": "./tools/games/ff10/decoders/ch.decoder.ts",
+		"Final Fantasy X (JP)": "./tools/games/ff10/decoders/jp.decoder.ts"
 	},
 	"inspectorHex.defaultDecoders": {
-		"data/final-fantasy-10-hd/extract/**/new_jppc/battle/btl/**/*.bin": "Final Fantasy X (JP)",
-		"data/final-fantasy-10-hd/extract/**/new_chpc/battle/btl/**/*.bin": "Final Fantasy X (CH)",
-		"data/final-fantasy-10-hd/extract/**/new_krpc/battle/btl/**/*.bin": "Final Fantasy X (KR)",
-		"data/final-fantasy-10-hd/extract/**/new_{us,de,it,fr,sp}pc/battle/btl/**/*.bin": "Final Fantasy X (US)"
+		"tools/games/ff10/source/**/new_jppc/battle/btl/**/*.bin": "Final Fantasy X (JP)",
+		"tools/games/ff10/source/**/new_chpc/battle/btl/**/*.bin": "Final Fantasy X (CH)",
+		"tools/games/ff10/source/**/new_krpc/battle/btl/**/*.bin": "Final Fantasy X (KR)",
+		"tools/games/ff10/source/**/new_{us,de,it,fr,sp}pc/battle/btl/**/*.bin": "Final Fantasy X (US)"
 	}
 }

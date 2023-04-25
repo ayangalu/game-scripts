@@ -2,6 +2,7 @@ import { readdirSync } from 'node:fs';
 
 import type { BinaryReader } from '@nishin/reader';
 
+import url from '../../../url.mjs';
 import { U8 } from '../u8.mjs';
 import { ControlCode, MSBT } from './msbt.mjs';
 
@@ -11,10 +12,10 @@ export interface MessageTree {
 
 export type LocalizedMessageTree = Record<string, MessageTree>;
 
-export function readMSBT(source: string, filter: (path: string) => boolean = () => true): LocalizedMessageTree {
-	const processSubTree = (directory: string) => {
+export function readMSBT(source: URL, filter: (path: URL) => boolean = () => true): LocalizedMessageTree {
+	const processSubTree = (directory: URL) => {
 		return readdirSync(directory, { withFileTypes: true }).reduce<MessageTree>((result, entry) => {
-			const path = `${directory}/${entry.name}`;
+			const path = url.join(directory, entry.name);
 
 			if (!filter(path)) {
 				return result;
@@ -40,7 +41,7 @@ export function readMSBT(source: string, filter: (path: string) => boolean = () 
 		}, {});
 	};
 
-	return Object.fromEntries(readdirSync(source).map((locale) => [locale, processSubTree(`${source}/${locale}`)]));
+	return Object.fromEntries(readdirSync(source).map((locale) => [locale, processSubTree(url.join(source, locale))]));
 }
 
 type ControlCodesConfig = {

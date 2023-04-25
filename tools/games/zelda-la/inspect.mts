@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs';
 import { controlCodes, readMSBT } from '../../parsers/nintendo/message-studio/inspect.mjs';
 import { MSBP } from '../../parsers/nintendo/message-studio/msbp.mjs';
 
-const root = `data/links-awakening/messages`;
+const root = new URL(`./source/switch/messages`, import.meta.url);
 const locales = readdirSync(root);
 
 const msbp = Object.fromEntries(locales.map((locale) => [locale, new MSBP(`${root}/${locale}/richard.msbp`)] as const));

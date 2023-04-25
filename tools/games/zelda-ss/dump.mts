@@ -6,22 +6,21 @@ import { formatMessage } from '../../parsers/nintendo/message-studio/format.html
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { U8 } from '../../parsers/nintendo/u8.mjs';
 import { Skeleton } from '../../skeleton.mjs';
-import { data } from './data.mjs';
+import url from '../../url.mjs';
+import { buildTransformers } from './data.mjs';
 
 const htmlTools = new HtmlTools('skyward-sword');
 
 [
 	{
-		sourceRoot: 'data/skyward-sword/messages',
+		sourceRoot: new URL('./source/wii/messages', import.meta.url),
 		targetRoot: 'display/public/skyward-sword',
-		getTransformers: data.wii,
 	},
 	{
-		sourceRoot: 'data/skyward-sword-hd/messages',
+		sourceRoot: new URL('./source/switch/messages', import.meta.url),
 		targetRoot: 'display/public/skyward-sword-hd',
-		getTransformers: data.switch,
 	},
-].forEach(({ sourceRoot, targetRoot, getTransformers }) => {
+].forEach(({ sourceRoot, targetRoot }) => {
 	const dataDir = path.join(targetRoot, 'data');
 	const skeleton = new Skeleton(dataDir, {
 		'word.msbt': (target, source, merge) => {
@@ -29,13 +28,15 @@ const htmlTools = new HtmlTools('skyward-sword');
 		},
 	});
 
+	const getTransformers = buildTransformers(sourceRoot);
+
 	for (const locale of readdirSync(sourceRoot)) {
 		const result: NRecord<string, string, 4> = {};
-		const languageRoot = path.join(sourceRoot, locale);
+		const languageRoot = url.join(sourceRoot, locale);
 		const transformers = getTransformers(locale);
 
 		for (const folderName of readdirSync(languageRoot)) {
-			const u8 = new U8(path.join(languageRoot, folderName));
+			const u8 = new U8(url.join(languageRoot, folderName));
 
 			u8.files
 				.filter(({ name }) => name.endsWith('.msbt'))

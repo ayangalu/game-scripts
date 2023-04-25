@@ -33,12 +33,12 @@ export abstract class LMS<Blocks extends Record<keyof Blocks, unknown>> {
 	readonly blocks: Partial<Readonly<Blocks>>;
 
 	constructor(
-		source: string | Buffer,
+		source: string | URL | Buffer,
 		magic: string,
 		knownVersions: number[],
 		blocks: BlockProcessorCollection<Blocks>,
 	) {
-		const data = typeof source === 'string' ? readFileSync(source) : source;
+		const data = source instanceof Buffer ? source : readFileSync(source);
 
 		const reader = new BinaryReader(data);
 

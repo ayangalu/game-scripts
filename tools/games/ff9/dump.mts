@@ -1,7 +1,5 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-
-import { clone, createMerge, isComposite } from '@shigen/merge';
 
 import { HtmlTools } from '../../html-tools.mjs';
 import { Skeleton } from '../../skeleton.mjs';
@@ -11,25 +9,6 @@ import { aligned, localeMap } from './load-messages.mjs';
 type Transformer = (data: { openMarkupTags: string[]; locale: string; parameters: string[] }) => string;
 
 const htmlTools = new HtmlTools('final-fantasy-9');
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type DeepMergeFunction = typeof import('@shigen/merge').deepMerge;
-
-const merge: DeepMergeFunction = createMerge<DeepMergeFunction>({
-	visit: ({ values: [target, source] }) => {
-		if (isComposite(source) && Object.values(source).every((value) => typeof value === 'string')) {
-			return {};
-		}
-
-		target ??= Array.isArray(source) ? [] : {};
-
-		if (isComposite(target) && isComposite(source)) {
-			return merge(target, source);
-		}
-
-		return clone(target, source);
-	},
-});
 
 const buttonLookup = (type: 'joy' | 'key', id: string, locale = 'ja-JP') => {
 	switch (id) {

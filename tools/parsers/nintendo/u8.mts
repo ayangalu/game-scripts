@@ -53,8 +53,8 @@ export interface U8DataFile {
 export class U8 {
 	readonly files: readonly U8DataFile[];
 
-	constructor(source: string | Buffer) {
-		const data = typeof source === 'string' ? readFileSync(source) : source;
+	constructor(source: string | URL | Buffer) {
+		const data = source instanceof Buffer ? source : readFileSync(source);
 
 		const reader = new BinaryReader(data, ByteOrder.BigEndian);
 
