@@ -1,21 +1,20 @@
-import { readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { HtmlTools } from '../../html-tools.mjs';
+import type { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { Skeleton } from '../../skeleton.mjs';
 import url from '../../url.mjs';
 import { transformers } from './data.mjs';
 
-const htmlTools = new HtmlTools('links-awakening');
-
-const sourceRoot = new URL(`./source/switch/messages`, import.meta.url);
-const targetRoot = `display/public/links-awakening`;
-
-try {
+export default (platform: string, entry: GameEntry, html: HtmlTools) => {
+	const sourceRoot = new URL(`./source/${platform}/messages`, import.meta.url);
+	const targetRoot = `display/public/games/${entry.id}`;
 	const dataDir = path.join(targetRoot, 'data');
-	const skeleton = new Skeleton(dataDir);
+	const skeleton = new Skeleton(targetRoot);
+
+	mkdirSync(dataDir, { recursive: true });
 
 	for (const locale of readdirSync(sourceRoot)) {
 		const result: NRecord<string, string, 3> = {};
@@ -31,17 +30,7 @@ try {
 
 					const markup = formatMessage(entry.message, {}, transformers);
 
-					if (!htmlTools.cache.includes(markup)) {
-						const report = htmlTools.validate(markup);
-
-						if (report.valid) {
-							htmlTools.cache.push(markup);
-						} else {
-							console.log(`ERROR: ${locale} ${filename} ${entry.label}`);
-							htmlTools.persistCache();
-							throw new Error(report.results[0].messages[0].message);
-						}
-					}
+					html.validate(markup);
 
 					decodedEntries[entry.label] = {
 						[locale]: markup,
@@ -57,6 +46,4 @@ try {
 	}
 
 	skeleton.persist();
-} finally {
-	htmlTools.persistCache();
-}
+};

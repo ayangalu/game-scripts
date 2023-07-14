@@ -325,7 +325,7 @@ export function buildTransformers(root: URL) {
 				},
 				0x0002: {
 					0x0000: () => [
-						{ name: 'player-name', type: 'opening', attribute: { character: 'tloz:link' } },
+						{ name: 'player-name', type: 'opening', attribute: { character: 'zelda:link' } },
 						{ name: 'player-name', type: 'closing' },
 					],
 					0x0001: variableTransformer(2, itemMap[locale]),

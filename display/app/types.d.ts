@@ -20,7 +20,13 @@ interface PathItem {
 	readonly label: string;
 }
 
-// type SlSelectSingle = import('@shoelace-style/shoelace').SlSelect & {
-// 	readonly multiple: false;
-// 	value: string;
-// };
+type MenuTree = {
+	readonly [key: string]: string | MenuTree;
+};
+
+type LabeledMenuBlock = {
+	readonly label: string;
+	readonly items: readonly string[];
+};
+
+type MenuViewProvider = (entries: readonly GameEntry[]) => MenuTree | readonly LabeledMenuBlock[];

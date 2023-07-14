@@ -1,8 +1,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
 
-import { encode as htmlEncode } from 'html-entities';
 import { HtmlValidate } from 'html-validate';
+
+import url from './url.mjs';
 
 const htmlValidate = new HtmlValidate({
 	extends: ['html-validate:recommended'],
@@ -12,16 +12,15 @@ const htmlValidate = new HtmlValidate({
 });
 
 export class HtmlTools {
-	private cacheFile;
+	private readonly filePath;
+	private readonly cache: string[];
 
-	readonly cache: string[];
-
-	constructor(name: string) {
-		const cacheDir = `.cache/${name}`;
-		this.cacheFile = path.join(cacheDir, 'valid-html.json');
+	constructor(root: URL) {
+		const cacheDir = url.join(root, '.cache');
+		this.filePath = url.join(cacheDir, 'html.json');
 		this.cache = (() => {
 			try {
-				return JSON.parse(readFileSync(this.cacheFile, 'utf-8'));
+				return JSON.parse(readFileSync(this.filePath, 'utf-8'));
 			} catch {
 				mkdirSync(cacheDir, { recursive: true });
 				return [];
@@ -29,15 +28,19 @@ export class HtmlTools {
 		})();
 	}
 
-	encode(text: string) {
-		return htmlEncode(text);
-	}
+	validate(markup: string) {
+		if (!this.cache.includes(markup)) {
+			const report = htmlValidate.validateString(markup);
 
-	validate(template: string) {
-		return htmlValidate.validateString(template);
+			if (!report.valid) {
+				throw new Error(report.results[0].messages[0].message);
+			}
+
+			this.cache.push(markup);
+		}
 	}
 
 	persistCache() {
-		writeFileSync(this.cacheFile, JSON.stringify(this.cache));
+		writeFileSync(this.filePath, JSON.stringify(this.cache));
 	}
 }

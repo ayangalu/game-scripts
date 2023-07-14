@@ -1,7 +1,7 @@
-import { readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { HtmlTools } from '../../html-tools.mjs';
+import type { HtmlTools } from '../../html-tools.mjs';
 import { formatMessage } from '../../parsers/nintendo/message-studio/format.html.mjs';
 import { MSBT } from '../../parsers/nintendo/message-studio/msbt.mjs';
 import { U8 } from '../../parsers/nintendo/u8.mjs';
@@ -9,24 +9,17 @@ import { Skeleton } from '../../skeleton.mjs';
 import url from '../../url.mjs';
 import { buildTransformers } from './data.mjs';
 
-const htmlTools = new HtmlTools('skyward-sword');
-
-[
-	{
-		sourceRoot: new URL('./source/wii/messages', import.meta.url),
-		targetRoot: 'display/public/skyward-sword',
-	},
-	{
-		sourceRoot: new URL('./source/switch/messages', import.meta.url),
-		targetRoot: 'display/public/skyward-sword-hd',
-	},
-].forEach(({ sourceRoot, targetRoot }) => {
+export default (platform: string, entry: GameEntry, html: HtmlTools) => {
+	const sourceRoot = new URL(`./source/${platform}/messages`, import.meta.url);
+	const targetRoot = `display/public/games/${entry.id}`;
 	const dataDir = path.join(targetRoot, 'data');
-	const skeleton = new Skeleton(dataDir, {
+	const skeleton = new Skeleton(targetRoot, {
 		'word.msbt': (target, source, merge) => {
 			return Object.fromEntries(Object.entries(merge(target, source)).sort((a, b) => a[0].localeCompare(b[0], 'en-US')));
 		},
 	});
+
+	mkdirSync(dataDir, { recursive: true });
 
 	const getTransformers = buildTransformers(sourceRoot);
 
@@ -51,16 +44,7 @@ const htmlTools = new HtmlTools('skyward-sword');
 
 						const markup = formatMessage(entry.message, {}, transformers).replaceAll(/\n{3,}/gu, '\n\n');
 
-						if (!htmlTools.cache.includes(markup)) {
-							const report = htmlTools.validate(markup);
-
-							if (report.valid) {
-								htmlTools.cache.push(markup);
-							} else {
-								htmlTools.persistCache();
-								throw new Error(report.results[0].messages[0].message);
-							}
-						}
+						html.validate(markup);
 
 						decodedEntries[entry.label] = {
 							[locale]: markup,
@@ -78,6 +62,4 @@ const htmlTools = new HtmlTools('skyward-sword');
 	}
 
 	skeleton.persist();
-});
-
-htmlTools.persistCache();
+};

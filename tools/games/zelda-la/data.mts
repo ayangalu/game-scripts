@@ -121,7 +121,7 @@ export const transformers: TransformerTree = {
 			]),
 			0x0002: placeholderTransformer((payload) => `${payload.next(DataType.Uint8)}`),
 			0x0003: () => [
-				{ name: 'player-name', type: 'opening', attribute: { character: 'tloz:link' } },
+				{ name: 'player-name', type: 'opening', attribute: { character: 'zelda:link' } },
 				{ name: 'player-name', type: 'closing' },
 			],
 			0x0007: ({ reader, state: { openTags } }) => {

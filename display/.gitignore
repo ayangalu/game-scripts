@@ -4,3 +4,5 @@ vite.build-config.json
 *.png
 *.gz
 data/
+skeleton.json
+public/entries.json

@@ -36,7 +36,7 @@ specifiers:
   tsx: 3.12.3
   typescript: 4.9.5
   vite: 3.2.4
-  zod: 3.20.2
+  zod: 3.21.4
 
 dependencies:
   '@shoelace-style/shoelace': 2.0.0-beta.86
@@ -44,7 +44,7 @@ dependencies:
   lit: 2.5.0
   modern-css-reset: 1.4.0
   rxjs: 7.6.0
-  zod: 3.20.2
+  zod: 3.21.4
 
 devDependencies:
   '@inspector-hex/decoder-api': 0.3.6
@@ -2661,6 +2661,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod/3.20.2:
-    resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+  /zod/3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false

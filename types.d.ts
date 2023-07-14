@@ -17,3 +17,27 @@ type NRecord<K extends PropertyKey, V, N extends number, A extends unknown[] = N
 	: A extends [unknown, ...infer R]
 	? Record<K, NRecord<K, V, R['length'], R>>
 	: never;
+
+type LocalizedRecord<T> = {
+	readonly [key: string]: T;
+	readonly '*': T;
+};
+
+type Platform = 'PC' | 'Switch' | 'Wii';
+
+type DataTree = {
+	[key: string]: DataTree | null;
+};
+
+interface GameEntry {
+	readonly id: string;
+	readonly title: LocalizedRecord<string>;
+	readonly platform: Platform;
+	readonly version: string;
+	readonly dataTree: DataTree;
+	readonly locales: readonly string[];
+	readonly ruby?: readonly string[];
+	readonly characters?: {
+		readonly [key: string]: LocalizedRecord<string>;
+	};
+}

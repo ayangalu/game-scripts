@@ -12,8 +12,6 @@ import { path$ } from '~/state/path';
 
 import SearchWorker from '../../worker/search?worker';
 
-type GamesJson = NRecord<string, GameInfo, 2>;
-
 type ProcessorResult = [label: string, icon: string, items?: Iterable<unknown>];
 
 const labels = new WeakMap<SlTreeItem, string>();
@@ -45,12 +43,12 @@ export class Menu extends LitElement {
 	declare lazyItems: NodeListOf<SlTreeItem>;
 
 	@state()
-	declare games?: GamesJson;
+	declare entries?: readonly GameEntry[];
 
 	constructor() {
 		super();
-		fetchService.json<GamesJson>('games.json').then((data) => {
-			this.games = data;
+		fetchService.json<GameEntry[]>('entries.json').then((data) => {
+			this.entries = data;
 		});
 	}
 
@@ -120,7 +118,7 @@ export class Menu extends LitElement {
 	}
 
 	render() {
-		if (!this.games) {
+		if (!this.entries) {
 			return html`<sl-spinner></sl-spinner>`;
 		}
 
@@ -151,7 +149,7 @@ export class Menu extends LitElement {
 					path$.next(path);
 				}}
 			>
-				${Object.entries(this.games).map(([platform, games]) => {
+				${Object.entries(this.entries).map(([platform, games]) => {
 					return html`
 						<sl-tree-item ${registerLabel(platform)}>
 							<sl-icon name="pc-display-horizontal"></sl-icon>

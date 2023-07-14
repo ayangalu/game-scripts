@@ -34,22 +34,30 @@ export class App extends LitElement {
 			</aside>
 			${when(
 				this.gameData,
+				// () => html`
+				// 	<link rel="stylesheet" href=${`${this.gameData?.info.root}/style.css`} />
+				// 	<header>
+				// 		<gs-path></gs-path>
+				// 		<gs-locales-select></gs-locales-select>
+				// 		<div class="focus-search-container">
+				// 			<gs-focus-select></gs-focus-select>
+				// 			${when(
+				// 				this.gameData?.info.ruby?.some((locale) => this.selectedLocales.includes(locale)),
+				// 				() => html`<gs-ruby-toggle></gs-ruby-toggle>`,
+				// 			)}
+				// 			<gs-search-bar></gs-search-bar>
+				// 		</div>
+				// 	</header>
+				// 	<main>
+				// 		<gs-message-table></gs-message-table>
+				// 	</main>
+				// `,
 				() => html`
-					<link rel="stylesheet" href=${`${this.gameData?.info.root}/style.css`} />
-					<header>
-						<gs-path></gs-path>
-						<gs-locales-select></gs-locales-select>
-						<div class="focus-search-container">
-							<gs-focus-select></gs-focus-select>
-							${when(
-								this.gameData?.info.ruby?.some((locale) => this.selectedLocales.includes(locale)),
-								() => html`<gs-ruby-toggle></gs-ruby-toggle>`,
-							)}
-							<gs-search-bar></gs-search-bar>
-						</div>
-					</header>
-					<main>
-						<gs-message-table></gs-message-table>
+					<main class="no-data">
+						<sl-alert open>
+							<sl-icon slot="icon" name="info-circle"></sl-icon>
+							Select a game
+						</sl-alert>
 					</main>
 				`,
 				() => html`
