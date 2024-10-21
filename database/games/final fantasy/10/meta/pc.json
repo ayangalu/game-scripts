@@ -1,0 +1,17 @@
+{
+	"id": "a9a020a8-145c-43d5-95fc-28161648ff5a",
+	"title": {
+		"ja-JP": "ファイナルファンタジーX",
+		"*": "Final Fantasy X"
+	},
+	"platform": "PC",
+	"version": "2023-04-29T20:59:36.792Z",
+	"fileTree": [],
+	"locales": [],
+	"characters": {
+		"ff9:zidane": {
+			"ja-JP": "ティーダ",
+			"*": "Tidus"
+		}
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "@game-scripts/schema",
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		"./file-tree": "./src/file-tree-ts",
+		"./game-entry": "./src/game-entry.ts",
+		"./message": "./src/message.ts"
+	}
+}

@@ -1,5 +1,10 @@
 {
 	"files": [],
 	"include": [],
-	"references": [{ "path": "tsconfig.tools.json" }, { "path": "tsconfig.display.json" }]
+	"references": [
+		{ "path": "tsconfig.display.json" },
+		{ "path": "schema/tsconfig.json" },
+		{ "path": "tools/tsconfig.json" },
+		{ "path": "database/tsconfig.json" }
+	]
 }

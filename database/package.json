@@ -1,0 +1,15 @@
+{
+	"name": "@game-scripts/database",
+	"type": "module",
+	"scripts": {
+		"build:meta": "tsx cli/build-meta.ts",
+		"dump": "tsx cli/dump.ts",
+		"inspect": "tsx cli/inspect.ts"
+	},
+	"dependencies": {
+		"@game-scripts/schema": "*",
+		"@game-scripts/tools": "*",
+		"@inquirer/prompts": "7.0.0",
+		"glob": "11.0.0"
+	}
+}

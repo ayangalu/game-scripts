@@ -14,9 +14,9 @@ module.exports = {
 	env: {
 		es2021: true,
 	},
-	plugins: ['style'],
+	plugins: ['@shigen'],
 	rules: {
-		'style/group-imports': [
+		'@shigen/group-imports': [
 			'error',
 			'@dotenv/config',
 			{ class: 'node' },
@@ -24,10 +24,11 @@ module.exports = {
 			'@shoelace-style/shoelace/dist/themes',
 			'@shoelace-style/shoelace/dist/components',
 			{ class: 'external' },
+			'@game-scripts',
 			'~',
 			{ class: 'relative' },
 		],
-		'style/sort-imports': ['error', { caseGroups: true, typesInGroup: 'top' }],
+		'@shigen/sort-imports': ['error', { caseGroups: true, typesInGroup: 'top' }],
 	},
 	overrides: [
 		{

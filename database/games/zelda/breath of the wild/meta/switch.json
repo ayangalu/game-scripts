@@ -1,0 +1,32 @@
+{
+	"id": "7067f04e-06eb-4664-a914-3dbb53623320",
+	"title": {
+		"ja-JP": "ゼルダの伝説 ブレス オブ ザ ワイルド",
+		"*": "The Legend of Zelda: Breath of the Wild"
+	},
+	"platform": "Switch",
+	"version": "2023-04-29T20:59:36.792Z",
+	"fileTree": [
+		{
+			"name": "*",
+			"items": ["*"]
+		}
+	],
+	"locales": [
+		"de-DE",
+		"en-GB",
+		"en-US",
+		"es-ES",
+		"es-US",
+		"fr-FR",
+		"fr-US",
+		"it-IT",
+		"ja-JP",
+		"ko-KR",
+		"nl-NL",
+		"ru-RU",
+		"zh-CN",
+		"zh-TW"
+	],
+	"ruby": ["ja-JP"]
+}

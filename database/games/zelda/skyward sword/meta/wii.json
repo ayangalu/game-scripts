@@ -1,0 +1,23 @@
+{
+	"id": "d048969d-7eb3-40f1-815f-eb087111cf87",
+	"title": {
+		"ja-JP": "ゼルダの伝説 スカイウォードソード",
+		"*": "The Legend of Zelda: Skyward Sword"
+	},
+	"platform": "Wii",
+	"version": "2023-04-29T20:59:36.792Z",
+	"fileTree": [
+		{
+			"name": "*",
+			"items": ["*"]
+		}
+	],
+	"locales": ["de-DE", "en-GB", "en-US", "es-ES", "es-US", "fr-FR", "fr-US", "it-IT", "ja-JP"],
+	"ruby": ["ja-JP"],
+	"characters": {
+		"zelda:link": {
+			"ja-JP": "リンク",
+			"*": "Link"
+		}
+	}
+}

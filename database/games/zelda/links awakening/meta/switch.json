@@ -1,0 +1,37 @@
+{
+	"id": "9422c289-0f9e-4405-b8f2-69190d09195b",
+	"title": {
+		"ja-JP": "ゼルダの伝説 夢をみる島",
+		"*": "The Legend of Zelda: Link’s Awakening"
+	},
+	"platform": "Switch",
+	"version": "2023-04-29T20:59:36.792Z",
+	"fileTree": ["*"],
+	"locales": [
+		"de-DE",
+		"en-GB",
+		"en-US",
+		"es-ES",
+		"es-US",
+		"fr-FR",
+		"fr-US",
+		"it-IT",
+		"ja-JP",
+		"ko-KR",
+		"nl-NL",
+		"ru-RU",
+		"zh-CN",
+		"zh-TW"
+	],
+	"ruby": ["ja-JP"],
+	"characters": {
+		"zelda:link": {
+			"ja-JP": "リンク",
+			"ko-KR": "링크",
+			"ru-RU": "Линк",
+			"zh-CN": "林克",
+			"zh-TW": "林克",
+			"*": "Link"
+		}
+	}
+}

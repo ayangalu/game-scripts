@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
+		"exactOptionalPropertyTypes": true,
+		"esModuleInterop": true,
+		"target": "es2022",
+		"moduleDetection": "force",
+		"module": "node16"
+	}
+}

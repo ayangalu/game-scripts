@@ -1,0 +1,66 @@
+{
+	"id": "46b90e4b-3d38-4b86-8ffc-4497ce250963",
+	"title": {
+		"ja-JP": "ファイナルファンタジーIX",
+		"*": "Final Fantasy IX"
+	},
+	"platform": "PC",
+	"version": "2023-04-29T20:59:36.792Z",
+	"fileTree": [
+		"localization.txt",
+		{
+			"name": "*",
+			"items": ["*"]
+		}
+	],
+	"locales": ["de-DE", "en-GB", "en-US", "es-ES", "fr-FR", "it-IT", "ja-JP"],
+	"characters": {
+		"ff9:zidane": {
+			"es-ES": "Yitán",
+			"fr-FR": "Djidane",
+			"it-IT": "Gidan",
+			"ja-JP": "ジタン",
+			"*": "Zidane"
+		},
+		"ff9:vivi": {
+			"fr-FR": "Bibi",
+			"ja-JP": "ビビ",
+			"*": "Vivi"
+		},
+		"ff9:dagger": {
+			"es-ES": "Daga",
+			"fr-FR": "Dagga",
+			"de-DE": "Lili",
+			"it-IT": "Daga",
+			"ja-JP": "ダガー",
+			"*": "Dagger"
+		},
+		"ff9:steiner": {
+			"ja-JP": "スタイナー",
+			"*": "Steiner"
+		},
+		"ff9:freya": {
+			"es-ES": "Freija",
+			"fr-FR": "Freyja",
+			"de-DE": "Freija",
+			"it-IT": "Flyer",
+			"ja-JP": "フライヤ",
+			"*": "Freya"
+		},
+		"ff9:quina": {
+			"fr-FR": "Kweena",
+			"ja-JP": "クイナ",
+			"*": "Quina"
+		},
+		"ff9:eiko": {
+			"ja-JP": "エーコ",
+			"*": "Eiko"
+		},
+		"ff9:amarant": {
+			"fr-FR": "Tarask",
+			"de-DE": "Mahagon",
+			"ja-JP": "サラマンダー",
+			"*": "Amarant"
+		}
+	}
+}
