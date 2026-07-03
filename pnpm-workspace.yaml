@@ -1,0 +1,13 @@
+packages:
+  - 'packages/*'
+
+catalog:
+  "@binary-tools/core": 2.0.0
+  "@binary-tools/node-fs": 2.0.0
+  "@tao/tashikame": 1.0.0
+  "@tao/merge": 1.0.0
+  "type-fest": 5.7.0
+
+minimumReleaseAgeExclude:
+  - eslint@10.6.0
+  - web-tree-sitter@0.26.10

@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		// type checking
+		"exactOptionalPropertyTypes": true,
+		"noImplicitOverride": true,
+		"noUncheckedIndexedAccess": true,
+		"useUnknownInCatchVariables": true,
+
+		// modules
+		"module": "nodenext",
+		"noUncheckedSideEffectImports": true,
+		"rewriteRelativeImportExtensions": true,
+
+		// emit
+		"noEmit": true,
+
+		// interop constraints
+		"erasableSyntaxOnly": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+
+		// language and environment
+		"experimentalDecorators": true,
+		"useDefineForClassFields": false,
+		"target": "es2025",
+		"lib": ["es2025"],
+
+		// completeness
+		"skipLibCheck": true
+	}
+}

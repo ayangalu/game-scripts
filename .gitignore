@@ -1,0 +1,5 @@
+node_modules
+eslint-typegen.d.ts
+.cache
+.temp
+.env
