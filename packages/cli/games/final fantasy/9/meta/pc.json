@@ -5,13 +5,6 @@
 		"*": "Final Fantasy IX"
 	},
 	"platform": "PC",
-	"fileTree": [
-		"localization.txt",
-		{
-			"name": "*",
-			"items": ["*"]
-		}
-	],
 	"locales": ["de-DE", "en-GB", "en-US", "es-ES", "fr-FR", "it-IT", "ja-JP"],
 	"characters": {
 		"ff9:zidane": {

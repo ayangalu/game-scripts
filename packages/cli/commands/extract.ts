@@ -3,6 +3,7 @@ import path from "node:path";
 
 import type { Promisable } from "type-fest";
 import { validate } from "@tao/tashikame";
+import { zipSync, type Zippable } from "fflate";
 
 import { GameEntry } from "@game-scripts/schema/game-entry";
 
@@ -14,11 +15,10 @@ export type ExtractMeta = {
 	readonly platform: string;
 	readonly entry: GameEntry;
 	readonly targetDir: string;
-	readonly dataDir: string;
 	readonly html: HtmlTools;
 };
 
-export type Extractor = (meta: ExtractMeta) => Promisable<void>;
+export type Extractor = (meta: ExtractMeta) => Promisable<Zippable>;
 
 const gameRoot = await selectEntry("extract");
 const html = new HtmlTools(gameRoot);
@@ -33,12 +33,13 @@ try {
 	for (const variant of await fs.readdir(path.join(gameRoot, "meta"))) {
 		const platform = path.parse(variant).name;
 		const entry = validate(GameEntry, JSON.parse(await fs.readFile(path.join(gameRoot, "meta", variant), "utf-8")));
-		const targetDir = process.argv.includes("--prod") ? `../display/public/games/${entry.id}` : `${gameRoot}/.temp/${entry.id}`;
-		const dataDir = `${targetDir}/data`;
+		const targetDir = process.argv.includes("--prod") ? `../display/public/games` : `${gameRoot}/.temp`;
 
-		await fs.mkdir(dataDir, { recursive: true, });
+		const zip = zipSync({
+			[entry.id]: await extract({ platform, entry, targetDir, html, }),
+		});
 
-		await extract({ platform, entry, targetDir, dataDir, html, });
+		await fs.writeFile(path.join(targetDir, "data.zip"), zip);
 	}
 } finally {
 	html.persistCache();

@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import type { Zippable } from "fflate";
+import { jsonData, textData } from "@binary-tools/core/encoder";
 import { array, object, validate, type Infer } from "@tao/tashikame";
 import dedent from "dedent";
 import { match, P } from "ts-pattern";
@@ -10,7 +12,6 @@ import type { Extractor } from "#/commands/extract.ts";
 import { ensure } from "#/util/ensure.ts";
 import { Image } from "#/util/image.ts";
 import { mapEntries } from "#/util/map-entries.ts";
-import { Skeleton } from "#/util/skeleton.ts";
 
 import { iconMap } from "./assembly-data.ts";
 import { aligned, localeMap } from "./load-messages.ts";
@@ -211,7 +212,7 @@ const transformers: Record<string, Transformer> = {
 	},
 };
 
-export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
+export const extract: Extractor = async ({ html, }) => {
 	const transform = (message: string, locale: string, openMarkupTags: string[] = []) => {
 		const transformedMessage = [ ...message.matchAll(/\[([A-Z0-9]+?)(?:=(.+?))?\]/g), ].reduce(
 			(result, [ matchValue, tag, parameters, ]) => {
@@ -234,87 +235,91 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 		const message = entry[locale];
 
 		if (!message) {
-			return {};
+			return "";
 		}
 
-		return {
-			[locale]: transform(message, locale),
-		};
+		return transform(message, locale);
 	};
 
-	const skeleton = new Skeleton(targetDir);
+	const zipData: Zippable = {};
+	const fileList = new Set<string>();
 
 	for (const locale of Object.values(localeMap)) {
 		const messages = {
-			"localization.txt": mapEntries(aligned.get([ "manifest", "localization.txt", ]), (entries, name) => {
-				console.log(locale, `manifest/text/localization.txt/${name}`);
-				return extractLocale(locale, entries);
+			"manifest/text/localization.txt": mapEntries(aligned.get([ "manifest", "localization.txt", ]), (name, entries) => {
+				console.log(locale, `manifest/text/localization.txt ${name}`);
+				return [ name, extractLocale(locale, entries), ];
 			}),
-			"field": mapEntries(aligned.get([ "field", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "field", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `field/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/field/${file}`, list, ] as const;
 			}),
-			"item": mapEntries(aligned.get([ "item", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "item", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `item/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/item/${file}`, list, ] as const;
 			}),
-			"keyitem": mapEntries(aligned.get([ "keyitem", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "keyitem", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `keyitem/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/keyitem/${file}`, list, ] as const;
 			}),
-			"ability": mapEntries(aligned.get([ "ability", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "ability", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `ability/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/ability/${file}`, list, ] as const;
 			}),
-			"command": mapEntries(aligned.get([ "command", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "command", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `command/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/command/${file}`, list, ] as const;
 			}),
-			"battle": mapEntries(aligned.get([ "battle", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "battle", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `battle/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/battle/${file}`, list, ] as const;
 			}),
-			"location": {
-				"loc_name.mes": mapEntries(aligned.get([ "location", "loc_name.mes", ]), (entries, index) => {
-					console.log(locale, `location/log_name.mes #${index}`);
-					return extractLocale(locale, entries);
-				}),
-			},
-			"etc": mapEntries(aligned.get([ "etc", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			"text/location/loc_name.mes": mapEntries(aligned.get([ "location", "loc_name.mes", ]), (id, entries) => {
+				console.log(locale, `manifest/text/localization.txt ${id}`);
+				return [ id, extractLocale(locale, entries), ];
+			}),
+			...mapEntries(aligned.get([ "etc", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `etc/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/etc/${file}`, list, ] as const;
 			}),
-			"title": mapEntries(aligned.get([ "title", ]), (entries, file) => {
-				return Object.entries(entries).map(([ index, entry, ]) => {
+			...mapEntries(aligned.get([ "title", ]), (file, entries) => {
+				const list = Object.values(entries).map((entry, index) => {
 					console.log(locale, `title/${file} #${index}`);
 					return extractLocale(locale, entry);
 				});
+				return [ `text/title/${file}`, list, ] as const;
 			}),
 		};
 
-		skeleton.update(messages);
-		await fs.writeFile(path.join(dataDir, `${locale}.json`), JSON.stringify(messages));
+		for (const filePath of Object.keys(messages)) {
+			fileList.add(filePath);
+		}
+
+		zipData[`data/${locale}.json`] = jsonData(messages);
 	}
 
-	skeleton.persist();
-
-	const iconsPath = path.join(targetDir, "icons");
-
-	await fs.mkdir(iconsPath, { recursive: true, });
+	zipData["files.json"] = jsonData(Array.from(fileList));
 
 	const IconSprite = object({
 		name: "string",
@@ -338,11 +343,11 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 		}),
 	});
 
-	const iconSprites: Array<Infer<typeof IconSprite>> = [];
+	const iconSprites = new Map<Infer<typeof IconSprite>, string>();
 
 	for (const source of [ "Icon Atlas", "TutorialUI Atlas", ]) {
 		const atlasDir = path.join(exportPath, "ExportedProject/Assets/Resources/embeddedasset/ui/atlas");
-		const sheet = await Image.load(path.join(atlasDir, `${source}.png`));
+		const sheet = await Image.loadPng(path.join(atlasDir, `${source}.png`));
 		const prefabSource = await fs.readFile(path.join(atlasDir, `${source}.prefab`), "utf-8");
 		const prefab = parseAllDocuments(prefabSource, { stringKeys: true, });
 		const iconsPrefab = validate(IconsPrefab, prefab[2]?.toJSON());
@@ -356,15 +361,15 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 
 			console.log("icon", sprite.name);
 
-			iconSprites.push(sprite);
-
 			const { x, y, width, height, } = sprite;
 			const { paddingLeft: left, paddingRight: right, paddingTop: top, paddingBottom: bottom, } = sprite;
 
-			await sheet
+			const png = await sheet
 				.crop({ x, y, width, height, })
 				.pad({ left, right, top, bottom, }, [ 0, 0, 0, 0, ])
-				.toPng(path.join(iconsPath, `${sprite.name}.png`));
+				.toPng();
+
+			iconSprites.set(sprite, png.data.toBase64());
 		}
 	}
 
@@ -407,16 +412,17 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 			vertical-align: middle;
 		}
 
-		${iconSprites.map((sprite) => {
+		${[ ...iconSprites.entries(), ].map(([ sprite, data, ]) => {
 			const width = sprite.width + sprite.paddingLeft + sprite.paddingRight;
 			const height = sprite.height + sprite.paddingTop + sprite.paddingBottom;
+			const dataUrl = `data:image/png;base64,${data}`;
 
 			if (sprite.name === "keyboard_button") {
 				return dedent/* css */`
 					.icon.keyboard-button {
 						--width: ${width};
 						--height: ${height};
-						background-image: url("icons/keyboard_button.png");
+						background-image: url("${dataUrl}");
 						font-size: 0.5em;
 						place-content: center;
 					}
@@ -428,7 +434,7 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 			if (variant) {
 				return dedent/* css */`
 					:is(${variant.locales.map((locale) => `[lang="${locale}"]`).join(", ")}) .icon.${variant.for.replaceAll("_", "-")} {
-						background-image: url("icons/${sprite.name}.png");
+						background-image: url("${dataUrl}");
 					}
 				`;
 			}
@@ -437,11 +443,13 @@ export const extract: Extractor = async ({ html, targetDir, dataDir, }) => {
 				.icon.${sprite.name.replaceAll("_", "-")} {
 					--width: ${width};
 					--height: ${height};
-					background-image: url("icons/${sprite.name}.png");
+					background-image: url("${dataUrl}");
 				}
 			`;
 		}).join("\n\n")}
 	`;
 
-	await fs.writeFile(path.join(targetDir, "styles.css"), styles, "utf-8");
+	zipData["styles.css"] = textData(styles);
+
+	return zipData;
 };

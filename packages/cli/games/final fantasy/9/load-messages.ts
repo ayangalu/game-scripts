@@ -19,8 +19,9 @@ const textsPath = path.join(assetsPath, "text");
 export const raw = nestedRecord<3, string>();
 
 for (const entry of await glob(`*/*/*.{mes,txt}`, { cwd: textsPath, withFileTypes: true, })) {
+	// AssetRipper exports some assets with duplicate extensions, e.g. *.mes.mes or *.txt.txt
 	const rawPath = validate(tuple([ "string", "string", "string", ]), entry.relativePosix().replace(/(\..+?)\1$/, "$1").split("/"));
-	const data = await readFile(entry.fullpathPosix(), "utf-8");
+	const data = await readFile(entry.fullpath(), "utf-8");
 	raw.set(rawPath, data);
 }
 

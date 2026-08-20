@@ -23,7 +23,7 @@
 		"experimentalDecorators": true,
 		"useDefineForClassFields": false,
 		"target": "es2025",
-		"lib": ["es2025"],
+		"lib": ["es2025", "esnext.typedarrays", "esnext.temporal"],
 
 		// completeness
 		"skipLibCheck": true

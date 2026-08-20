@@ -1,7 +1,5 @@
 import { array, literal, object, record, union, type Infer, type Schema } from "@tao/tashikame";
 
-import { FileTree } from "./file-tree.ts";
-
 export type LocaleVariant = {
 	readonly "*": string;
 	readonly [key: string]: string;
@@ -22,44 +20,30 @@ export type Platform = Infer<typeof Platform>;
 
 export const GameEntry = object(
 	{
-		id: {
-			value: "string",
-			inferReadonly: true,
-		},
-		title: {
-			value: LocaleVariant,
-			inferReadonly: true,
-		},
-		platform: {
-			value: Platform,
-			inferReadonly: true,
-		},
+		id: "string",
+		title: LocaleVariant,
+		platform: Platform,
 		version: {
 			value: "string",
 			optional: true,
-			inferReadonly: true,
 		},
-		fileTree: {
-			value: FileTree,
-			inferReadonly: true,
+		extractionTime: {
+			value: "string",
+			default: () => Temporal.Now.plainDateTimeISO("UTC").toString(),
 		},
-		locales: {
-			value: array("string", { inferReadonly: true, }),
-			inferReadonly: true,
-		},
+		locales: array("string"),
 		ruby: {
-			value: array("string", { inferReadonly: true, }),
+			value: array("string"),
 			optional: true,
-			inferReadonly: true,
 		},
 		characters: {
-			value: record(LocaleVariant, { inferReadonly: true, }),
+			value: record(LocaleVariant),
 			optional: true,
-			inferReadonly: true,
 		},
 	},
 	{
 		name: "GameEntry",
+		inferReadonly: "deep",
 	},
 );
 

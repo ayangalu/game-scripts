@@ -23,7 +23,7 @@ type CropView = {
 };
 
 export class Image {
-	static async load(path: string) {
+	static async loadPng(path: string) {
 		const png = await decodePng(await fs.readFile(path), { force32: true, });
 		const { data, width, height, } = png.image;
 		return new Image(data, width, height);
@@ -107,13 +107,11 @@ export class Image {
 		return new Image(new Uint8Array(this.data.toReversed().flat(2)), this.width, this.height);
 	}
 
-	async toPng(path: string) {
-		const png = await encodePng({
+	async toPng() {
+		return encodePng({
 			data: this.buffer,
 			width: this.width,
 			height: this.height,
 		});
-
-		return fs.writeFile(path, png.data);
 	}
 }

@@ -1,0 +1,22 @@
+{
+	"name": "@game-scripts/web",
+	"private": true,
+	"type": "module",
+	"imports": {
+		"#/*.ts": "./*.ts"
+	},
+	"scripts": {
+		"start": "vite"
+	},
+	"dependencies": {
+		"lit": "3.3.3",
+		"@awesome.me/webawesome": "3.10.0",
+		"@phosphor-icons/core": "2.1.1",
+		"@tao/tashikame": "catalog:"
+	},
+	"devDependencies": {
+		"@types/web": "0.0.352",
+		"vite": "8.1.4",
+		"type-fest": "catalog:"
+	}
+}
